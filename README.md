@@ -125,4 +125,3 @@ This project is licensed under the MIT License. See [LICENSE](LICENSE) for detai
   * Takibur Chowdhury (@Taki127)
   * Jason 
 
-Feel free to add your names and contact info here.

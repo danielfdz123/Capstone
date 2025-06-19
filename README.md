@@ -123,5 +123,6 @@ This project is licensed under the MIT License. See [LICENSE](LICENSE) for detai
 
   * Afif Hamim (@afif978)
   * Takibur Chowdhury (@Taki127)
-  * Jason 
+  * Jason
+  * Kevin Weng (K-EV1N)
 

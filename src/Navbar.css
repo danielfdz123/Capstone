@@ -1,0 +1,36 @@
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 20px;
+    background-color: #3a3a3a;
+    color: white;
+    font-family: Arial, sans-serif;
+    border-radius: 30px;
+  }
+  
+  .nav-left a {
+    color: white;
+    text-decoration: none;
+    margin-right: 20px;
+    font-weight: 500;
+    transition: color 0.3s ease;
+  }
+  
+  .nav-left a:hover {
+    color: #61dafb;
+  }
+  
+  .nav-right .profile-circle {
+    width: 35px;
+    height: 35px;
+    background-color: #61dafb;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid white;
+    transition: background-color 0.3s ease;
+  }
+  
+  .nav-right .profile-circle:hover {
+    background-color: #21a1f1;
+  }

@@ -1,9 +1,9 @@
+import React from 'react';
+import ExerciseForm from '../components/ExerciseForm';
 const Fitness = () => {
     return (
         <>
-        <div className="box1"> Fitness </div>
-        <div className="box2"> </div>
-        <div className="box3"> </div>
+        <ExerciseForm />
         </>
     )
 }

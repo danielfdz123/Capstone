@@ -34,10 +34,14 @@ const Signup = () => {
 
 
     return (
-        <div className = "signup-container">
-            <h2 className = "signup-title">Sign Up </h2>
+        <div className = "signupBox">
+            <img src = 'logo.png' className = 'logoImg'/>
             <form onSubmit = {createAccount}>
-                <label> Username: </label>
+            <p className = "signupHeading"> Fill out the form below to create an account! </p>
+
+            <div className = "signupForm">            
+                {/* CREATE USERNAME */}
+                <h2> Username: </h2>
                 <input
                     type = "text"
                     name = "username"
@@ -45,9 +49,9 @@ const Signup = () => {
                     onChange = {handleChange}
                     required
                 />
-                <br/>
 
-                <label> Email: </label>
+                {/* ENTER EMAIL */}
+                <h2> Email: </h2>
                 <input
                     type = "email"
                     name = "email"
@@ -55,9 +59,9 @@ const Signup = () => {
                     onChange = {handleChange}
                     required
                 />
-                <br/>
-
-                <label> Password: </label>
+                
+                {/* CREATE PASSWORD */}
+                <h2> Password: </h2>
                 <input
                     type = "password"
                     name = "password"
@@ -65,11 +69,19 @@ const Signup = () => {
                     onChange = {handleChange}
                     required
                 />
-                <br/>
-                <button type="submit"> Create Account </button>
+
+                {/* SUBMIT BUTTON */}
+                    <div className = "createAccDiv">
+                        <button className = "createAccButton" type="submit"> Create Account </button>
+                    </div>
+                </div>
             </form>
 
-            <p> Already have an account? <Link to="/"> Login here </Link> </p>
+            <p className = "bottomText"> Already have an account?&nbsp;
+                <Link className = "bottomText" to = "/"> 
+                    Login here 
+                </Link> 
+            </p>
         </div>
     );
 };

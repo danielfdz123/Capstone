@@ -1,35 +1,23 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import React from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+
 import './App.css'
-import {BrowserRouter as Router, Routes, Route} from 'react-router-dom'
-import Navbar from './Navbar.jsx';
-import Home from './pages/Home.jsx';
-import Fitness from './pages/Fitness.jsx';
-import Diet from './pages/Diet.jsx';
-import History from './pages/History.jsx';
-import Social from './pages/Social.jsx';
+import Login from '../Pages/Login';
+import SignUp from '../Pages/Signup';
+import Home from '../Pages/Home';
 
-
-function App() {
-
+const App = () => {
   return (
-  <>
-  <Router>
-    <Navbar />
-    <div className="content-container">
-    <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/fitness" element={<Fitness />} />
-      <Route path="/diet" element={<Diet />} />
-      <Route path="/history" element={<History />} />
-      <Route path="/social" element={<Social />} />
-    </Routes>
+    <div className = "App">
+      <BrowserRouter>
+        <Routes>
+          <Route path = '/' element = {<Login/>} />
+          <Route path = '/signup' element = {<SignUp/>} />
+          <Route path = '/home' element = {<Home/>} />
+        </Routes>
+      </BrowserRouter>
     </div>
-  </Router>
-  </>
   );
- 
-}
+};
 
 export default App;

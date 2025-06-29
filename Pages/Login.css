@@ -1,0 +1,39 @@
+.loginBox {
+    background-color: #e3e5de;
+    padding: 50px;
+    border-radius: 20px;
+}
+
+.logoImg {
+    /* border: 1px solid black; */
+    border-radius: 10px;
+    width: 300px;
+    height: 80px;
+}
+
+.loginText, .passwordText, .bottomText, .link {
+    color: rgb(0, 0, 0);
+}
+
+.buttonDiv {
+    padding-top: 30px;    
+    display: flex;
+}
+
+.loginBtn, .signupBtn {
+    /* border: 1px solid black; */
+    width: 100%;
+    float: left;
+}
+
+.loginButton, .signupButton {
+    color: black;
+    background-color: transparent;
+    border-radius: 10px;
+    height: 125%;
+    width: 70%;
+    cursor: pointer;
+}
+.error {
+    color: red;
+}

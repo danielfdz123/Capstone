@@ -1,0 +1,35 @@
+.signupBox {
+    background-color: #e3e5de;
+    padding: 50px;
+    border-radius: 20px;
+}
+
+.logoImg {
+    /* border: 1px solid black; */
+    border-radius: 10px;
+    width: 300px;
+    height: 80px;
+}
+
+.signupHeading {
+    color: black;
+}
+
+.signupForm h2 {
+    color: black;
+}
+
+.createAccDiv {
+    padding-top: 30px;    
+}
+
+.createAccButton {
+    color: black;
+    background-color: transparent;
+    border-radius: 10px;
+    height: 200%;
+    width: 40%;
+    cursor: pointer;
+    padding: 5px;
+    /* border: 1px solid black; */
+}

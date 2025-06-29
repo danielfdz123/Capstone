@@ -1,0 +1,274 @@
+<!DOC<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fitness Goal Planner</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f4f8;
+      padding: 2rem;
+      color: #333;
+    }
+    .container {
+      max-width: 700px;
+      margin: auto;
+      background: white;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    label {
+      display: block;
+      margin-top: 1rem;
+    }
+    input, select {
+      width: 100%;
+      padding: 0.5rem;
+      margin-top: 0.5rem;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    button {
+      margin-top: 1.5rem;
+      padding: 0.75rem;
+      width: 100%;
+      border: none;
+      border-radius: 5px;
+      background: #007bff;
+      color: white;
+      font-size: 1rem;
+    }
+    .result, .tab-content {
+      margin-top: 2rem;
+      padding: 1rem;
+      background: #e9f7ef;
+      border: 1px solid #c3e6cb;
+      border-radius: 5px;
+    }
+    .workout {
+      margin-top: 1rem;
+    }
+    .workout h4 {
+      margin-bottom: 0.5rem;
+    }
+    .workout ul {
+      padding-left: 1.5rem;
+    }
+    .tabs {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+    .tabs button {
+      flex: 1;
+      padding: 0.75rem;
+      background: #f1f1f1;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .tabs button.active {
+      background: #007bff;
+      color: white;
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+    #tracker {
+      margin-top: 2rem;
+      padding: 1rem;
+      background: #fff3cd;
+      border: 1px solid #ffeeba;
+      border-radius: 5px;
+    }
+    #tracker label, #tracker input {
+      margin-top: 0.5rem;
+    }
+    #progressOutput {
+      margin-top: 1rem;
+      background: #e2e3e5;
+      border: 1px solid #d6d8db;
+      padding: 1rem;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Fitness Goal Planner</h1>
+    <form onsubmit="event.preventDefault(); generatePlan();">
+      <label for="weight">Weight (lbs):</label>
+      <input type="number" id="weight" required />
+
+      <label for="height">Height (inches):</label>
+      <input type="number" id="height" required />
+
+      <label for="gender">Gender:</label>
+      <select id="gender">
+        <option value="male">Male</option>
+        <option value="female">Female</option>
+      </select>
+
+      <label for="goal">Fitness Goal:</label>
+      <select id="goal">
+        <option value="aesthetics">Aesthetics</option>
+        <option value="strength">Strength</option>
+        <option value="cardio">Cardio</option>
+      </select>
+
+      <button type="submit">Generate Plan</button>
+    </form>
+
+    <div class="tabs">
+      <button id="planTab" class="active" onclick="showTab('plan')">Workout Plan</button>
+      <button id="dietTab" onclick="showTab('diet')">Diet Plan</button>
+    </div>
+
+    <div id="output" class="tab-content active"></div>
+    <div id="dietOutput" class="tab-content"></div>
+
+    <div id="tracker">
+      <h3>Progress Tracker</h3>
+      <label for="currentWeight">Current Weight (lbs):</label>
+      <input type="number" id="currentWeight" />
+      <label for="targetWeight">Target Weight (lbs):</label>
+      <input type="number" id="targetWeight" />
+      <label for="weeks">Weeks to Reach Goal:</label>
+      <input type="number" id="weeks" />
+      <button onclick="calculateProgress()">Calculate Progress</button>
+      <div id="progressOutput"></div>
+    </div>
+  </div>
+
+  <script>
+    function showTab(tab) {
+      document.getElementById('output').classList.remove('active');
+      document.getElementById('dietOutput').classList.remove('active');
+      document.getElementById('planTab').classList.remove('active');
+      document.getElementById('dietTab').classList.remove('active');
+
+      document.getElementById(tab + 'Output').classList.add('active');
+      document.getElementById(tab + 'Tab').classList.add('active');
+    }
+
+    function generatePlan() {
+      const weight = parseFloat(document.getElementById('weight').value);
+      const height = parseFloat(document.getElementById('height').value);
+      const gender = document.getElementById('gender').value;
+      const goal = document.getElementById('goal').value;
+
+      if (isNaN(weight) || isNaN(height)) {
+        alert('Please enter valid weight and height.');
+        return;
+      }
+
+      const weightKg = weight * 0.453592;
+      const heightCm = height * 2.54;
+
+      let bmr;
+      if (gender === 'male') {
+        bmr = 10 * weightKg + 6.25 * heightCm - 5 * 25 + 5;
+      } else {
+        bmr = 10 * weightKg + 6.25 * heightCm - 5 * 25 - 161;
+      }
+
+      let calories, macros, workoutPlan, macroPercents;
+
+      switch(goal) {
+        case 'aesthetics':
+          calories = bmr * 1.1;
+          macroPercents = { protein: 0.4, carbs: 0.4, fat: 0.2 };
+          workoutPlan = `
+            <div class="workout">
+              <h4>Weekly Split</h4>
+              <ul>
+                <li>Monday: Legs (Gym)</li>
+                <li>Tuesday: Push (Calisthenics)</li>
+                <li>Thursday: Pull (Calisthenics)</li>
+              </ul>
+            </div>
+          `;
+          break;
+        case 'strength':
+          calories = bmr * 1.2;
+          macroPercents = { protein: 0.3, carbs: 0.4, fat: 0.3 };
+          workoutPlan = `
+            <div class="workout">
+              <h4>Weekly Split</h4>
+              <ul>
+                <li>Monday: Heavy Squats and Deadlifts</li>
+                <li>Tuesday: Bench Press and Overhead Press</li>
+                <li>Thursday: Pull-Ups and Rows</li>
+                <li>Friday: Total Body Conditioning</li>
+              </ul>
+            </div>
+          `;
+          break;
+        case 'cardio':
+          calories = bmr * 1.0;
+          macroPercents = { protein: 0.25, carbs: 0.55, fat: 0.2 };
+          workoutPlan = `
+            <div class="workout">
+              <h4>Weekly Cardio Plan</h4>
+              <ul>
+                <li>Monday: 30 min Jog + Core</li>
+                <li>Wednesday: Interval Sprints</li>
+                <li>Friday: Long Distance Run</li>
+                <li>Saturday: Bike Ride or Swim</li>
+              </ul>
+            </div>
+          `;
+          break;
+      }
+
+      const proteinCalories = Math.round(calories * macroPercents.protein);
+      const carbCalories = Math.round(calories * macroPercents.carbs);
+      const fatCalories = Math.round(calories * macroPercents.fat);
+
+      const proteinGrams = Math.round(proteinCalories / 4);
+      const carbGrams = Math.round(carbCalories / 4);
+      const fatGrams = Math.round(fatCalories / 9);
+
+      document.getElementById('output').innerHTML = `
+        <h3>Your Personalized Plan</h3>
+        ${workoutPlan}
+      `;
+
+      document.getElementById('dietOutput').innerHTML = `
+        <h3>Diet Plan</h3>
+        <p><strong>Calories/day to Maintain:</strong> ${Math.round(bmr)}</p>
+        <p><strong>Calories/day to Lose Weight:</strong> ${Math.round(bmr * 0.8)}</p>
+        <p><strong>Calories/day to Gain Weight:</strong> ${Math.round(bmr * 1.2)}</p>
+        <p><strong>Target Calories for Goal:</strong> ${Math.round(calories)}</p>
+        <p><strong>Suggested Macros:</strong></p>
+        <ul>
+          <li>Protein: ${proteinCalories} kcal (${proteinGrams} g)</li>
+          <li>Carbohydrates: ${carbCalories} kcal (${carbGrams} g)</li>
+          <li>Fats: ${fatCalories} kcal (${fatGrams} g)</li>
+        </ul>
+      `;
+    }
+
+    function calculateProgress() {
+      const currentWeight = parseFloat(document.getElementById('currentWeight').value);
+      const targetWeight = parseFloat(document.getElementById('targetWeight').value);
+      const weeks = parseFloat(document.getElementById('weeks').value);
+
+      if (isNaN(currentWeight) || isNaN(targetWeight) || isNaN(weeks) || weeks <= 0) {
+        alert("Please enter valid values for progress tracking.");
+        return;
+      }
+
+      const weeklyChange = (targetWeight - currentWeight) / weeks;
+      document.getElementById('progressOutput').innerHTML = `
+        <p><strong>Target Weekly Change:</strong> ${weeklyChange.toFixed(2)} lbs/week</p>
+      `;
+    }
+  </script>
+</body>
+</html>

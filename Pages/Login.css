@@ -1,7 +1,9 @@
 .loginBox {
-    background-color: #e3e5de;
+    background-color: #3B4452;
     padding: 50px;
     border-radius: 20px;
+    /* border: 1px solid black; */
+    margin-top: 175px;
 }
 
 .logoImg {
@@ -12,7 +14,7 @@
 }
 
 .loginText, .passwordText, .bottomText, .link {
-    color: rgb(0, 0, 0);
+    color: rgb(219, 219, 219);
 }
 
 .buttonDiv {
@@ -27,13 +29,14 @@
 }
 
 .loginButton, .signupButton {
-    color: black;
+    color: rgb(219, 219, 219);
     background-color: transparent;
     border-radius: 10px;
     height: 125%;
     width: 70%;
     cursor: pointer;
 }
+
 .error {
     color: red;
 }

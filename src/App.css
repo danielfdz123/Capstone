@@ -6,7 +6,7 @@
 }
 
 body {
-  background-color: #242424;
+  background-color: #1C222D;
 }
 
 .content-container {
@@ -15,47 +15,4 @@ body {
   flex-wrap: wrap;
   gap: 20px;
   padding: 40px 20px;
-}
-
-.box1 {
-  flex: 1;
-  min-width: 250px;
-  max-width: 350px;
-  height: 500px;
-  background-color: #3a3a3a;
-  color: white;
-  border-radius: 10px;
-  padding: 20px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-  text-align: center;
-  font-size: 1.2rem;
-}
-
-.box2 {
-  flex: 1;
-  min-width: 250px;
-  max-width: 350px;
-  height: 500px;
-  background-color: #3a3a3a;
-  color: white;
-  border-radius: 10px;
-  padding: 20px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-  text-align: center;
-  font-size: 1.2rem;
-}
-
-.box3 {
-  flex: 1;
-  min-width: 250px;
-  max-width: 350px;
-  height: 500px;
-  background-color: #3a3a3a;
-  color: white;
-  border-radius: 10px;
-  padding: 20px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-  text-align: center;
-  font-size: 1.2rem;
-
 }

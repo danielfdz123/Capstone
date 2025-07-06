@@ -8,6 +8,7 @@ const Signup = () => {
         username: '',
         email: '',
         password: '',
+        first_name: '',
     });
 
     const handleChange = (e) => {
@@ -22,6 +23,7 @@ const Signup = () => {
             username: accountInfo.username,
             email: accountInfo.email,
             password: accountInfo.password,
+            first_name: accountInfo.first_name,
             created_at: new Date().toISOString()
         });
             if (error) {
@@ -39,7 +41,17 @@ const Signup = () => {
             <form onSubmit = {createAccount}>
             <p className = "signupHeading"> Fill out the form below to create an account! </p>
 
-            <div className = "signupForm">            
+            <div className = "signupForm">    
+                {/* ENTER FIRST NAME */}
+                <h2> First Name: </h2>
+                <input
+                    type = "text"
+                    name = "first_name"
+                    value = {accountInfo.first_name}
+                    onChange = {handleChange}
+                    required
+                />
+        
                 {/* CREATE USERNAME */}
                 <h2> Username: </h2>
                 <input

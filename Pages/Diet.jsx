@@ -3,19 +3,19 @@ import { Link } from 'react-router-dom';
 import { supabase } from '../client';
 
 import Navbar from '../Components/Navbar';
+import FoodLog from '../Components/FoodLog';
 
 const Diet = () => {
-    return (
-        <div className = "dietBox">
-            <div className = "navDiv">
-                <Navbar />
-            </div>
-            <div className="box1"> Diet </div>
-        <div className="box2"> </div>
-        <div className="box3"> </div>
-        </div>
-
-    )
-}
+  return (
+    <div className="dietBox">
+      <div className="navDiv">
+        <Navbar />
+      </div>
+      <div className="foodLogContainer">
+        <FoodLog />
+      </div>
+    </div>
+  );
+};
 
 export default Diet;

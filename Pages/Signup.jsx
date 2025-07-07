@@ -4,6 +4,7 @@ import { supabase } from '../client';
 import './Signup.css';
 
 const Signup = () => {
+    const [error, setError] = useState('');
     const [accountInfo, setAccountInfo] = useState({
         username: '',
         email: '',
@@ -17,23 +18,60 @@ const Signup = () => {
 
     const createAccount = async (event) => {
         event.preventDefault();
-        const { data, error } = await supabase
-        .from('Accounts')
-        .insert({
-            username: accountInfo.username,
-            email: accountInfo.email,
-            password: accountInfo.password,
-            first_name: accountInfo.first_name,
-            created_at: new Date().toISOString()
-        });
-            if (error) {
+        setError('');
+        const { username, email, password, first_name } = accountInfo;
+        if (!username.trim() || !email.trim() || !password.trim() || !first_name.trim()) 
+        {
+            setError('All fields are required.');
+            return;
+        }
+
+        const { data: existingUsers, error: queryError } = await supabase
+            .from('Accounts')
+            .select('id, email, username')
+            .or(`email.eq.${email},username.eq.${username}`);
+
+        if (queryError) 
+        {
+            console.error('Error checking for existing user:', queryError.message);
+            setError('Something went wrong. Please try again.');
+            return;
+        }
+        if (existingUsers.length > 0) 
+        {
+            const emailExists = existingUsers.some(user => user.email === email);
+            const usernameExists = existingUsers.some(user => user.username === username);
+            if (emailExists && usernameExists) 
+            {
+                setError('Both email and username already exist.');
+            } 
+            else if (emailExists) 
+            {
+                setError('Email already exists.');
+            } 
+            else if (usernameExists) 
+            {
+                setError('Username already exists.');
+            }
+            return;
+        }
+        const { error: insertError } = await supabase
+            .from('Accounts')
+            .insert({
+                username: accountInfo.username,
+                email: accountInfo.email,
+                password: accountInfo.password,
+                first_name: accountInfo.first_name,
+                created_at: new Date().toISOString()
+            });
+
+        if (error) {
             console.error('Creat account error:', error.message);
             return;
         }
         console.log('Account created:', data);
         window.location = '/';
     };
-
 
     return (
         <div className = "signupBox">
@@ -81,6 +119,7 @@ const Signup = () => {
                     onChange = {handleChange}
                     required
                 />
+                {error && <p className="error">{error}</p>}
 
                 {/* SUBMIT BUTTON */}
                     <div className = "createAccDiv">

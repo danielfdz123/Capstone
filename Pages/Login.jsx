@@ -29,6 +29,8 @@ const Login = () => {
         } 
         else 
         {
+            const user = data[0];
+            localStorage.setItem('user', JSON.stringify(user));
             navigate('/home');
         }
     };

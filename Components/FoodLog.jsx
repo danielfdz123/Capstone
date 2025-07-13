@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './FoodLog.css';
 
 const FoodLog = () => {
@@ -53,6 +53,26 @@ const FoodLog = () => {
     setTotalCalories(totalCalories - removedFood.calories);
   };
 
+  const [showGif, setShowGif] = useState(false);
+
+  useEffect(() => {
+    const playDuration = 5000; // Show gif for 5 seconds
+    const intervalDuration = 60000; // Repeat every 60 seconds
+
+    const playGif = () => {
+      setShowGif(true);
+      setTimeout(() => setShowGif(false), playDuration);
+    };
+
+    playGif();
+
+    const interval = setInterval(() => {
+      playGif();
+    }, intervalDuration);
+
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <div className="exercise-container">
       <h2 className="exercise-heading"> 🍽️ Daily Food Log </h2>
@@ -92,6 +112,25 @@ const FoodLog = () => {
           )}
         </div>
       ))}
+
+      {showGif && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
+            backgroundColor: 'rgba(0,0,0,0.8)',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 9999,
+          }}
+        >
+          <img src="/foxy.gif" alt="Fun GIF" style={{ maxWidth: '100%', maxHeight: '100%' }} />
+        </div>
+      )}
     </div>
   );
 };

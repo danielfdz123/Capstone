@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './ExerciseForm.css';
+import './FoodLog.css';
 
 const FoodLog = () => {
   const [foodLog, setFoodLog] = useState({

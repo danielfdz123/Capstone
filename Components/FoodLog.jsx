@@ -1,3 +1,4 @@
+/*
 import React, { useState } from 'react';
 
 const foodOptions = [
@@ -174,4 +175,4 @@ const FoodLog = () => {
 };
 
 export default FoodLog;
-
+*/

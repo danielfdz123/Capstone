@@ -1,4 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { supabase } from '../client';
+
+import './Diet.css';
 import Navbar from '../Components/Navbar';
 
 // Food list

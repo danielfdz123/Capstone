@@ -9,6 +9,7 @@ const FoodLog = () => {
   });
 
   const [totalCalories, setTotalCalories] = useState(0);
+  const [showGif, setShowGif] = useState(false);
 
   const foodOptions = {
     breakfast: [
@@ -41,7 +42,7 @@ const FoodLog = () => {
     const updatedFoodLog = { ...foodLog, [meal]: updatedMeal };
 
     setFoodLog(updatedFoodLog);
-    setTotalCalories(totalCalories + food.calories);
+    setTotalCalories(prev => prev + food.calories);
   };
 
   const handleDeleteFood = (meal, index) => {
@@ -50,14 +51,12 @@ const FoodLog = () => {
     const updatedFoodLog = { ...foodLog, [meal]: updatedMeal };
 
     setFoodLog(updatedFoodLog);
-    setTotalCalories(totalCalories - removedFood.calories);
+    setTotalCalories(prev => prev - removedFood.calories);
   };
 
-  const [showGif, setShowGif] = useState(false);
-
   useEffect(() => {
-    const playDuration = 5000; // Show gif for 5 seconds
-    const intervalDuration = 60000; // Repeat every 60 seconds
+    const playDuration = 5000;
+    const intervalDuration = 60000;
 
     const playGif = () => {
       setShowGif(true);
@@ -65,70 +64,65 @@ const FoodLog = () => {
     };
 
     playGif();
-
-    const interval = setInterval(() => {
-      playGif();
-    }, intervalDuration);
-
+    const interval = setInterval(playGif, intervalDuration);
     return () => clearInterval(interval);
   }, []);
 
   return (
-    <div className="exercise-container">
-      <h2 className="exercise-heading"> 🍽️ Daily Food Log </h2>
-      <div className="exercise-card" style={{ textAlign: 'center', fontSize: '18px' }}>
-        Total Calories: {totalCalories} kcal
-      </div>
+    <div className="foodlog-container">
+      <h2 className="foodlog-heading">🍽️ Daily Food Log</h2>
+      <div className="total-calories">Total Calories: {totalCalories} kcal</div>
 
-      {['breakfast', 'lunch', 'dinner'].map(meal => (
-        <div key={meal} className="exercise-log">
-          <h3 className="logged-heading"> {meal.charAt(0).toUpperCase() + meal.slice(1)} </h3>
+      {['breakfast', 'lunch', 'dinner'].map((meal) => (
+        <div key={meal} className="meal-section">
+          <div className="meal-title">
+            {meal.charAt(0).toUpperCase() + meal.slice(1)}
+          </div>
 
-          <select
-            className="exercise-input"
-            onChange={(e) => {
-              const selected = foodOptions[meal].find(f => f.name === e.target.value);
-              if (selected) handleAddFood(meal, selected);
-            }}
-            defaultValue=""
-          >
-            <option value="" disabled> Select Food </option>
-            {foodOptions[meal].map((food, idx) => (
-              <option key={idx} value={food.name}>{food.name} ({food.calories} kcal)</option>
-            ))}
-          </select>
+          <div className="food-form">
+            <select
+              className="food-input"
+              onChange={(e) => {
+                const selected = foodOptions[meal].find(f => f.name === e.target.value);
+                if (selected) handleAddFood(meal, selected);
+              }}
+              defaultValue=""
+            >
+              <option value="" disabled>Select Food</option>
+              {foodOptions[meal].map((food, idx) => (
+                <option key={idx} value={food.name}>
+                  {food.name} ({food.calories} kcal)
+                </option>
+              ))}
+            </select>
+          </div>
 
-          {foodLog[meal].length === 0 ? (
-            <p className="no-data-text"> No foods logged yet. </p>
-          ) : (
-            foodLog[meal].map((item, idx) => (
-              <div key={idx} className="exercise-card">
-                <div className="exercise-details-row">
-                  <div className="exercise-details"> {item.name} - {item.calories} kcal </div>
-                  <button onClick={() => handleDeleteFood(meal, idx)} className="exercise-delete-button"> ✖ </button>
+          <div className="food-list">
+            {foodLog[meal].length === 0 ? (
+              <p style={{ color: 'white' }}>No foods logged yet.</p>
+            ) : (
+              foodLog[meal].map((item, idx) => (
+                <div key={idx} className="food-item">
+                  <span className="food-details">
+                    {item.name} - {item.calories} kcal
+                  </span>
+                  <button
+                    onClick={() => handleDeleteFood(meal, idx)}
+                    className="food-delete-button"
+                    aria-label="Delete food item"
+                  >
+                    ✖
+                  </button>
                 </div>
-              </div>
-            ))
-          )}
+              ))
+            )}
+          </div>
         </div>
       ))}
 
       {showGif && (
-        <div
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            width: '100vw',
-            height: '100vh',
-            backgroundColor: 'rgba(0,0,0,0.8)',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            zIndex: 9999,
-          }}
-        >
-          <img src="/foxy.gif" alt="Fun GIF" style={{ maxWidth: '100%', maxHeight: '100%' }} />
+        <div className="gif-overlay">
+          <img src="/foxy.gif" alt="Fun GIF" className="gif-img" />
         </div>
       )}
     </div>

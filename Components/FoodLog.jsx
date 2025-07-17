@@ -150,8 +150,8 @@ const FoodLog = () => {
         </div>
       ))}
 
-      {showGif && (
-        <div/*
+      {/* {showGif && (
+        <div
           style={{
             position: 'fixed',
             top: 0,
@@ -165,12 +165,11 @@ const FoodLog = () => {
             zIndex: 9999,
           }}
         >
-          <img src="/foxy.gif" alt="Fun GIF" style={{ maxWidth: '100%', maxHeight: '100%' }} />*/
+          <img src="/foxy.gif" alt="Fun GIF" style={{ maxWidth: '100%', maxHeight: '100%' }} />
         </div>
-      )}
+      )} */}
     </div>
   );
 };
 
 export default FoodLog;
-

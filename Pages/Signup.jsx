@@ -121,7 +121,7 @@ const Signup = () => {
 
                     {/* Submit Button */}
                     <div className="createAccDiv">
-                        <button className="createAccButton" type="submit">
+                        <button className = "createAccButton" type="submit">
                             Continue to profile setup
                         </button>
                     </div>

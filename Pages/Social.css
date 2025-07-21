@@ -1,0 +1,60 @@
+.social-page {
+    color: white;
+    padding: 2rem;
+    text-align: center;
+  }
+  
+  .friend-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+  }
+  
+  .friend-card {
+    background-color: #2e2e2e;
+    padding: 1rem 2rem;
+    border-radius: 10px;
+    box-shadow: 0 0 10px #00bcd4;
+    color: white;
+    transition: 0.3s ease;
+  }
+  
+  .friend-card:hover {
+    transform: scale(1.05);
+  }
+  
+  .friend-card button {
+    margin-top: 10px;
+    background-color: #00bcd4;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    color: white;
+    cursor: pointer;
+  }
+
+  .social-page {
+    color: white;
+    padding: 2rem;
+    max-width: 800px;
+    margin: auto;
+  }
+  
+  .friend-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  
+  .friend-search {
+    width: 100%;
+    padding: 0.5rem 1rem;
+    margin-bottom: 1rem;
+    border-radius: 20px;
+    border: none;
+    font-size: 1rem;
+  }
+  
+  

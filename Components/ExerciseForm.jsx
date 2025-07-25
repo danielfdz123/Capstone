@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import './ExerciseForm.css';
-import ProgressChart from './ProgressChart.jsx';
+import ProgressChart from '../Components/ProgressChart';
 import {supabase} from '../client';
 
 const normalizeName = (name) => name.trim().toLowerCase().replace(/[\s-]+/g, ' ');

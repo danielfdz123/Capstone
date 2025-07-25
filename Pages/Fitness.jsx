@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { supabase } from '../client';
 
 import Navbar from '../Components/Navbar';
-import ExerciseForm from '../components/ExerciseForm';
+import ExerciseForm from '../Components/ExerciseForm';
 
 const Fitness = () => {
     return (

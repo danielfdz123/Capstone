@@ -1,6 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import './ExerciseForm.css';
 import ProgressChart from './ProgressChart.jsx';
+import {supabase} from '../client';
 
 const normalizeName = (name) => name.trim().toLowerCase().replace(/[\s-]+/g, ' ');
 
@@ -41,6 +42,30 @@ const ExerciseForm = () => {
         const updatedList = [...exerciseList];
         updatedList.splice(index, 1);
         setExerciseList(updatedList);
+    };
+
+    const handleSaveWorkout = async () => {
+        if (exerciseList.length === 0) {
+            alert("No exercises to save.");
+            return;
+        }
+
+        const today = new Date().toISOString();
+        const {error} = await supabase
+            .from('workouts')
+            .insert([
+                {
+                    date: today,
+                    exercises: exerciseList
+                }
+            ]);
+        if (error) {
+            console.error("Error saving workout:", error);
+            alert("Failed to save workout. Please try again.");
+        } else {
+            alert("Workout saved successfully!");
+            setExerciseList([]);
+        }
     };
 
     return (
@@ -94,6 +119,10 @@ const ExerciseForm = () => {
                 <div className="chart-wrapper">
                     <ProgressChart exerciseList={exerciseList} exerciseName={selectedExercise} />
                 </div>
+            )}
+
+            {exerciseList.length > 0 && (
+                <button className="save-workout-button" onClick={handleSaveWorkout}> 📝 Save Workout </button>
             )}
         </div>
     );

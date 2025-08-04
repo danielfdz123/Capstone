@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import FriendCard from "../Components/FriendCard";
 import "./Social.css";
+import Navbar from '../Components/Navbar';
 
 const Social = () => {
   // initial hard‑coded suggestions
@@ -26,7 +27,14 @@ const Social = () => {
   );
 
   return (
+    
     <div className="social-page">
+        {/* IMPORT NAVBAR COMPONENT */}
+            <div className = "navDiv">
+                <Navbar />
+            </div>
+
+
       <h2>Your Friends</h2>
       <div className="friend-list">
         {friends.length

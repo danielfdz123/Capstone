@@ -49,15 +49,16 @@ const Signup = () => {
             return;
         }
 
-        const { error: insertError } = await supabase
+        const { data, error: insertError } = await supabase
             .from('Accounts')
             .insert({
                 username,
                 email,
                 password,
                 first_name,
-                created_at: new Date().toISOString()
-            });
+                created_at: new Date().toLocaleString('en-US', { timeZone: 'America/New_York' })
+            })
+            .select();
 
         if (insertError) {
             console.error('Create account error:', insertError.message);
@@ -65,16 +66,17 @@ const Signup = () => {
             return;
         }
 
-        // ✅ Redirect to setup page after successful signup
+        const newUser = data[0];
+        localStorage.setItem('user', JSON.stringify(newUser)); 
         window.location = '/setup';
     };
 
     return (
-        <div className="signupBox">
-            <img src="logo.png" className="logoImg" />
+        <div className = "signupBox">
+            <img src = "logo.png" className="logoImg" />
             <form onSubmit={createAccount}>
-                <p className="signupHeading">Fill out the form below to create an account!</p>
-                <div className="signupForm">
+                <p className = "signupHeading"> Fill out the form below to create an account!</p>
+                <div className = "signupForm">
 
                     {/* First Name */}
                     <h2>First Name:</h2>

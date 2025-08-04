@@ -24,12 +24,12 @@ const Login = () => {
             .eq('password', passwordInput);
 
         if (error || !data || data.length === 0) 
-            {
+        {
             setError('Invalid login credentials >:(');
         } 
         else 
         {
-            const user = data[0];
+            const user = data[0]; 
             localStorage.setItem('user', JSON.stringify(user));
             navigate('/home');
         }

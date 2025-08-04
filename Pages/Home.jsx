@@ -9,18 +9,61 @@ const Home = () => {
     const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
     const navigate = useNavigate();
     const [userFirstName, setUserFirstName] = useState('');
+    const [calories, setCalories] = useState('');
+    const [weight, setCurrentWeight] = useState('');
+    const [weightGoal, setWeightGoal] = useState('');
+    const [showModal, setShowModal] = useState(false);
 
     useEffect(() => {
         const storedUser = localStorage.getItem('user');
-        if (storedUser) 
+
+        const parsedUser = JSON.parse(storedUser);
+        const username = parsedUser.username;
+        const modalFlagKey = `homeModalShown_${username}`;
+        const modalShown = localStorage.getItem(modalFlagKey);
+        if (!modalShown) 
         {
-            const parsedUser = JSON.parse(storedUser);
-            setUserFirstName(parsedUser.first_name || parsedUser.username || 'User');
+            setShowModal(true);
+            localStorage.setItem(modalFlagKey, 'true');
         }
+        const fetchStats = async () => {
+            const { username } = JSON.parse(storedUser);
+            const { data, error } = await supabase
+            .from('Stats')
+            .select('*')
+            .eq('username', username)
+            .single();
+            if (error) 
+            {
+                console.error('Error fetching stats:', error);
+                return;
+            }
+            if (data) 
+            {
+                setUserFirstName(data.first_name || 'User');
+                setCalories(data.calorieGoal || 250);
+                setCurrentWeight(data.currentWeight);
+                setWeightGoal(data.weightGoal);
+            }
+        };
+        fetchStats();
     }, []);
 
-
     return (
+    <>
+        {/* WELCOME MESSAGE - Only shows once per new account */}
+       {showModal && (
+        <div className = "welcomeDiv">
+          <div className = "welcomeMsg">
+            <h1>🎉 Welcome to FitFormula! 🎉 </h1>
+            <p> Be sure to click the circle icon in the top right to finish setting up your account! </p>
+            <p> Feel free to update any values like weight/calories in your account settings so they align with your goals! </p>
+            <p> Thank you for signing up, we look forward to seeing your fitness journey! 💪 </p>
+            <button onClick={() => setShowModal(false)}> Lets Go! </button>
+          </div>
+        </div>
+      )}
+
         <div className="homeBox">
             {/* IMPORT NAVBAR COMPONENT */}
             <div className = "navDiv">
@@ -44,8 +87,8 @@ const Home = () => {
                     {/* CALORIES INFO */}
                     <div className = "card">
                         <h3> Calories Remaining </h3>
-                        <h2> 2000 </h2>
-                        <p> Goal: 2000 | Consumed: 0 | 1Burned: 0</p>
+                        <h2> {calories} </h2>
+                        <p> Goal: 2000 | Consumed: 0 | Burned: 0 </p>
                         <div className = "progressBar">
                             {/* Need to figure out how to make this work, would be cool tbh */}
                         </div>
@@ -61,8 +104,8 @@ const Home = () => {
                     {/* WEIGHT PROGRESS INFO */}
                     <div className = "card">
                         <h3> Weight Progress</h3>
-                        <h2> -- lbs</h2>
-                        <p> Complete your profile to track progress </p>
+                        <h2> {weight} lbs</h2>
+                        <p> Weight Goal: {weightGoal} lbs</p>
                         <div className = "progressBar">
                             {/* Need to figure out how to make this work, would be cool tbh */}
                         </div>
@@ -85,6 +128,7 @@ const Home = () => {
                 </div>
             </div>
         </div>
+    </>
     );
 };
 

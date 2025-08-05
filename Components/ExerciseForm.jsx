@@ -1,129 +1,159 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import './ExerciseForm.css';
-import ProgressChart from '../Components/ProgressChart';
-import {supabase} from '../client';
+import { supabase } from '../client';
 
-const normalizeName = (name) => name.trim().toLowerCase().replace(/[\s-]+/g, ' ');
+const normalizeName = (name) => name.trim().replace(/[\s-]+/g, ' ');
 
-const ExerciseForm = () => {
-    const [exercise, setExercise] = useState({ name: '', sets: '', reps: '', weight: '' });
+const ExerciseForm = ({ username, onExerciseLogged }) => {
+    const [exerciseDay, setExerciseDay] = useState('');
+    const [exercise, setExercise] = useState({ name: '', sets: 1, reps: '', weight: '' });
+    const [setDetails, setSetDetails] = useState([]);
     const [exerciseList, setExerciseList] = useState([]);
-    const [selectedExercise, setSelectedExercise] = useState('');
+
+    const today = new Date();
+    const formattedDate = today.toISOString().split('T')[0];
+
+    useEffect(() => {
+        // Gets any exercise within this current day, ranging 24-hours
+        const fetchTodayExercises = async () => {
+            if (!username) return;
+            const { data, error } = await supabase
+                .from('Exercise')
+                .select()
+                .eq('username', username)
+                .gte('date', formattedDate)
+                .lt('date', new Date(today.getTime() + 24 * 60 * 60 * 1000).toISOString().split('T')[0]);
+            if (!error) {
+                setExerciseList(data);
+            }
+        };
+        fetchTodayExercises();
+    }, [username]);
 
     const handleChange = (e) => {
         setExercise({ ...exercise, [e.target.name]: e.target.value });
     };
 
-    const handleAddExercise = (e) => {
+    const handleNextSet = (e) => {
         e.preventDefault();
-        const { name, sets, reps, weight } = exercise;
-        if (!name || !sets || !reps) {
-            alert('Please fill in all fields');
+        const { name, reps, weight } = exercise;
+        if (!name || !reps || !weight) {
+            alert('Finish your current set before moving onto the next one.');
+            return;
+        }
+        setSetDetails([...setDetails, { reps, weight }]);
+        setExercise({
+            ...exercise,
+            sets: exercise.sets + 1,
+            reps: '',
+            weight: ''
+        });
+    };
+
+    const handleNextExercise = async (e) => {
+        e.preventDefault();
+        const { name } = exercise;
+        if (!name || setDetails.length === 0) {
+            alert('Please complete at least one set before moving onto the next exercise!');
             return;
         }
 
-        const today = new Date();
-        const formattedDate = `${today.getMonth() + 1}/${today.getDate()}/${today.getFullYear()}`;
-        const normalizedName = normalizeName(name);
+        const exerciseName = normalizeName(name);
+        const reps = setDetails.map(s => parseFloat(s.reps));
+        const weight = setDetails.map(s => parseFloat(s.weight));
+        const sets = setDetails.length;
 
         const newExercise = {
-            name: normalizedName,
+            username,
+            date: new Date().toISOString(),
+            workoutDay: exerciseDay,
+            exercise: exerciseName,
             sets,
             reps,
-            weight,
-            date: formattedDate
+            weight
         };
 
-        setExerciseList([...exerciseList, newExercise]);
-        setExercise({ name: '', sets: '', reps: '', weight: '' });
-    };
-
-    const handleDelete = (index) => {
-        const updatedList = [...exerciseList];
-        updatedList.splice(index, 1);
-        setExerciseList(updatedList);
-    };
-
-    const handleSaveWorkout = async () => {
-        if (exerciseList.length === 0) {
-            alert("No exercises to save.");
-            return;
-        }
-
-        const today = new Date().toISOString();
-        const {error} = await supabase
-            .from('workouts')
-            .insert([
-                {
-                    date: today,
-                    exercises: exerciseList
-                }
-            ]);
+        const { error } = await supabase.from('Exercise').insert(newExercise);
         if (error) {
-            console.error("Error saving workout:", error);
-            alert("Failed to save workout. Please try again.");
+            console.error('Insert error:', error);
         } else {
-            alert("Workout saved successfully!");
-            setExerciseList([]);
+            const updatedList = [...exerciseList, newExercise];
+            setExerciseList(updatedList);
+            setExercise({ name: '', sets: 1, reps: '', weight: '' });
+            setSetDetails([]);
+            if (onExerciseLogged) onExerciseLogged(updatedList.length);
         }
     };
 
     return (
-        <div className={`main-layout ${selectedExercise ? 'two-column' : ''}`}>
-            <div className="exercise-container">
-                <h2 className="exercise-heading">🏋️ Add Exercise</h2>
-                <form onSubmit={handleAddExercise} className="exercise-form">
-                    <input className="exercise-input" name="name" placeholder="Exercise Name" value={exercise.name} onChange={handleChange} />
-                    <input className="exercise-input" type="number" name="sets" placeholder="Sets" value={exercise.sets} onChange={handleChange} />
-                    <input className="exercise-input" type="number" name="reps" placeholder="Reps" value={exercise.reps} onChange={handleChange} />
-                    <input className="exercise-input" type="number" name="weight" placeholder="Weight (lb)" value={exercise.weight} onChange={handleChange} />
-                    <button type="submit" className="exercise-add-button">Add</button>
+        <div className = "main-layout">
+            <div className = "exercise-container">
+                <h2 className = "exercise-heading">🏋️ Add Exercise </h2>
+
+                {/* SPECIFY WORKOUT DAY CONTENT  */}
+                <h4 className = "exerciseDay">
+                    Today is:
+                    <input
+                        className = "exercise-input"
+                        placeholder = "Ex: Chest Day"
+                        value = {exerciseDay}
+                        onChange = {(e) => setExerciseDay(e.target.value)}
+                        required
+                        readOnly = {exercise.sets > 1}
+                    />
+                </h4>
+
+                {/* ADDING EXERCISE CONTENT  */}
+                <form className = "exercise-form">
+                    <input
+                        className = "exercise-input"
+                        type = "text"
+                        name = "name"
+                        placeholder = "Exercise Name"
+                        value = {exercise.name}
+                        onChange = {handleChange}
+                        required
+                        readOnly = {exercise.sets > 1}
+                    />
+                    <input
+                        className = "exercise-input"
+                        type = "text"
+                        name = "sets"
+                        value = {`Set #${exercise.sets}`}
+                        readOnly
+                    />
+                    <input
+                        className = "exercise-input"
+                        type = "number"
+                        name = "reps"
+                        placeholder = {setDetails.length > 0 ? `Previous Rep: ${setDetails.at(-1).reps}` : "Reps"}
+                        value = {exercise.reps}
+                        onChange = {handleChange}
+                        required
+                    />
+                    <input
+                        className = "exercise-input"
+                        type = "number"
+                        name = "weight"
+                        placeholder = {setDetails.length > 0 ? `Previous Weight: ${setDetails.at(-1).weight}lbs` : "Weight (lbs)"}
+                        value = {exercise.weight}
+                        onChange = {handleChange}
+                        required
+                    />
+                    <button className = "nextSet" onClick={handleNextSet}>Next Set</button>
+                    <button className = "nextExercise" onClick={handleNextExercise}>Next Exercise</button>
                 </form>
 
-                {exerciseList.length > 0 && (
-                    <div>
-                        <label htmlFor="exerciseSelect" className="select-label">📈 View Progress</label>
-                        <select
-                            id="exerciseSelect"
-                            className="select-exercise"
-                            value={selectedExercise}
-                            onChange={(e) => setSelectedExercise(e.target.value)}
-                        >
-                            <option value="">-- Select Exercise --</option>
-                            {[...new Set(exerciseList.map(ex => ex.name))].map((name, index) => (
-                                <option key={index} value={name}>{name}</option>
-                            ))}
-                        </select>
+                {/* HISTOTY CONTENT  */}
+                {exerciseList.map((ex, index) => (
+                    <div className = "exerciseHistory" key={index}>
+                        <div className = "exerciseName"> {ex.exercise} </div>
+                        <div className = "exerciseSets"> {ex.sets} sets </div>
+                        <div className = "exerciseReps"> Reps: {Array.isArray(ex.reps) ? ex.reps.join(', ') : ex.reps} </div>
+                        <div className = "exerciseWeight"> {Array.isArray(ex.weight) ? ex.weight.join(', ') : ex.weight} lbs </div>
                     </div>
-                )}
-
-                <div className="exercise-log-container">
-                    <h3 className="logged-heading">📝 Logged Exercises</h3>
-                    <div className="exercise-log">
-                        {exerciseList.length === 0 && <p className="no-data-text">No exercises logged yet.</p>}
-                        {exerciseList.map((ex, index) => (
-                            <div key={index} className="exercise-card">
-                                <div className="exercise-name">{ex.name}</div>
-                                <div className="exercise-details-row">
-                                    <div className="exercise-details">{ex.sets} sets x {ex.reps} reps {ex.weight && `@ ${ex.weight} lb`}</div>
-                                    <div className="exercise-date">{ex.date}</div>
-                                    <button onClick={() => handleDelete(index)} className="exercise-delete-button">✖</button>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
+                ))}
             </div>
-
-            {selectedExercise && (
-                <div className="chart-wrapper">
-                    <ProgressChart exerciseList={exerciseList} exerciseName={selectedExercise} />
-                </div>
-            )}
-
-            {exerciseList.length > 0 && (
-                <button className="save-workout-button" onClick={handleSaveWorkout}> 📝 Save Workout </button>
-            )}
         </div>
     );
 };

@@ -6,17 +6,17 @@ import './Home.css';
 import Navbar from '../Components/Navbar';
 
 const Home = () => {
-    const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+    const [selectedDate, setSelectedDate] = useState('');    
     const navigate = useNavigate();
     const [userFirstName, setUserFirstName] = useState('');
     const [calories, setCalories] = useState('');
     const [weight, setCurrentWeight] = useState('');
     const [weightGoal, setWeightGoal] = useState('');
     const [showModal, setShowModal] = useState(false);
+    const [exerciseCount, setExerciseCount] = useState(0);
 
     useEffect(() => {
         const storedUser = localStorage.getItem('user');
-
         const parsedUser = JSON.parse(storedUser);
         const username = parsedUser.username;
         const modalFlagKey = `homeModalShown_${username}`;
@@ -26,6 +26,16 @@ const Home = () => {
             setShowModal(true);
             localStorage.setItem(modalFlagKey, 'true');
         }
+        const today = new Date();
+        const date = today.toLocaleDateString("en-US", {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'numeric',
+            day: 'numeric',
+            timeZone: 'America/New_York'
+        });
+        setSelectedDate(date);
+
         const fetchStats = async () => {
             const { username } = JSON.parse(storedUser);
             const { data, error } = await supabase
@@ -47,12 +57,29 @@ const Home = () => {
             }
         };
         fetchStats();
-    }, []);
+
+        const fetchExerciseCount = async () => {
+            const { username } = JSON.parse(storedUser);
+            const todaysDate = new Date().toISOString().split('T')[0];
+            const tomorrowDate = new Date(new Date().getTime() + 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+            const { data, error } = await supabase
+                .from('Exercise')
+                .select('id')
+                .eq('username', username)
+                .gte('date', todaysDate)
+                .lt('date', tomorrowDate);
+            if (!error && data) 
+            {
+                setExerciseCount(data.length);
+            }
+        };
+        fetchExerciseCount();
+        }, []);
 
     return (
     <>
         {/* WELCOME MESSAGE - Only shows once per new account */}
-       {showModal && (
+        {showModal && (
         <div className = "welcomeDiv">
           <div className = "welcomeMsg">
             <h1>🎉 Welcome to FitFormula! 🎉 </h1>
@@ -75,18 +102,13 @@ const Home = () => {
                 <div className = "intro">
                     <h1> Welcome {userFirstName}! </h1>
                     <p> Time to lock in! No pain, no gain! </p>
-                    <input
-                        type = "date"
-                        className = "calendar"
-                        value = {selectedDate}
-                        onChange = {(e) => setSelectedDate(e.target.value)}
-                    />
+                    <h6 className = "calendarText"> 📅 {selectedDate} </h6>
                 </div>
                 
                 <div className = "cardInfoDiv">
                     {/* CALORIES INFO */}
                     <div className = "card">
-                        <h3> Calories Remaining </h3>
+                        <h3> Calories Remaining: </h3>
                         <h2> {calories} </h2>
                         <p> Goal: 2000 | Consumed: 0 | Burned: 0 </p>
                         <div className = "progressBar">
@@ -96,14 +118,14 @@ const Home = () => {
 
                     {/* EXERCISE COUNT INFO */}
                     <div className = "card">
-                        <h3> Exercise Today </h3>
-                        <h2> 0 </h2>
-                        <p> 0 workouts completed</p>
+                        <h3> Exercises Today: </h3>
+                        <h2> {exerciseCount} </h2>
+                        <p>{exerciseCount} {exerciseCount === 1 ? 'Workout' : 'Workouts'} Completed</p>
                     </div>
 
                     {/* WEIGHT PROGRESS INFO */}
                     <div className = "card">
-                        <h3> Weight Progress</h3>
+                        <h3> Weight Progress: </h3>
                         <h2> {weight} lbs</h2>
                         <p> Weight Goal: {weightGoal} lbs</p>
                         <div className = "progressBar">

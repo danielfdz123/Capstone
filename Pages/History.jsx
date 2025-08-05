@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from '../Components/Navbar';
 import {supabase} from '../client';
-import axios from 'axios';
 import './History.css';
 
 const History = () => {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { supabase } from '../supabaseClient'; // ✅ CHANGED
+import { supabase } from '../client'; // ✅ CHANGED
 import './FoodLog.css';
 
 const FoodLog = () => {

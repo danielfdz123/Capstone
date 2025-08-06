@@ -1,4 +1,4 @@
-.signupBox {
+.setupBox {
     background-color: #3B4452;
     padding: 50px;
     border-radius: 20px;
@@ -12,19 +12,19 @@
     height: 80px;
 }
 
-.signupHeading {
+.setupHeading {
     color: rgb(219, 219, 219);
 }
 
-.signupForm h2 {
+.setupForm h2 {
     color: rgb(219, 219, 219);
 }
 
-.createAccDiv {
-    padding-top: 30px;    
+.continueDiv {
+    padding-top: 30px;
 }
 
-.createAccButton {
+.continueButton {
     color: rgb(219, 219, 219);
     background-color: transparent;
     border-radius: 10px;
@@ -35,6 +35,3 @@
     /* border: 1px solid black; */
 }
 
-.bottomText {
-    color: rgb(219, 219, 219);
-}

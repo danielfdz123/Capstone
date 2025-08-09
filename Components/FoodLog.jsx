@@ -1,14 +1,18 @@
 import React, { useState, useEffect } from 'react';
+import { supabase } from '../client'; // ✅ CHANGED
 import './FoodLog.css';
 
 const FoodLog = () => {
   const [foodLog, setFoodLog] = useState({
     breakfast: [],
     lunch: [],
-    dinner: []
+    dinner: [],
   });
 
   const [totalCalories, setTotalCalories] = useState(0);
+  const [username] = useState('your_username'); // ✅ CHANGED — ideally fetch from auth
+
+  const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
 
   const fullFoodList = [
     { name: 'Apple', calories: 95, serving: '1 medium' },
@@ -80,33 +84,91 @@ const FoodLog = () => {
 
   const foodOptions = distributeFoods(fullFoodList);
 
-  const handleAddFood = (meal, food) => {
+  const handleAddFood = async (meal, food) => {
     const updatedMeal = [...foodLog[meal], food];
     const updatedFoodLog = { ...foodLog, [meal]: updatedMeal };
     setFoodLog(updatedFoodLog);
-    setTotalCalories(totalCalories + food.calories);
+    setTotalCalories(prev => prev + food.calories);
+
+    // ✅ INSERT into Supabase
+    const { error } = await supabase.from('Diet').insert({
+      username,
+      date: new Date().toISOString(), // full timestamp
+      food: food.name,
+      foodCount: 1,
+      calories: food.calories,
+    });
+
+    if (error) {
+      console.error('Error inserting into Supabase:', error);
+    }
   };
 
-  const handleDeleteFood = (meal, index) => {
+  const handleDeleteFood = async (meal, index) => {
     const removedFood = foodLog[meal][index];
     const updatedMeal = foodLog[meal].filter((_, i) => i !== index);
     const updatedFoodLog = { ...foodLog, [meal]: updatedMeal };
     setFoodLog(updatedFoodLog);
-    setTotalCalories(totalCalories - removedFood.calories);
+    setTotalCalories(prev => prev - removedFood.calories);
+
+    // ✅ DELETE from Supabase — you can improve this with unique IDs
+    const { error } = await supabase
+      .from('Diet')
+      .delete()
+      .match({
+        username,
+        food: removedFood.name,
+        calories: removedFood.calories,
+        date: removedFood.date || today, // attempt to match on date
+      });
+
+    if (error) {
+      console.error('Error deleting from Supabase:', error);
+    }
   };
 
-  const [showGif, setShowGif] = useState(false);
+  const fetchFoodLog = async () => {
+    const { data, error } = await supabase
+      .from('Diet')
+      .select('*')
+      .eq('username', username)
+      .gte('date', `${today}T00:00:00`)
+      .lte('date', `${today}T23:59:59`);
+
+    if (error) {
+      console.error('Error fetching from Supabase:', error);
+      return;
+    }
+
+    const meals = {
+      breakfast: [],
+      lunch: [],
+      dinner: [],
+    };
+
+    let calorieSum = 0;
+
+    data.forEach(entry => {
+      const food = fullFoodList.find(f => f.name === entry.food);
+      if (food) {
+        const mealType = guessMealTime(new Date(entry.date).getHours());
+        meals[mealType].push(food);
+        calorieSum += food.calories;
+      }
+    });
+
+    setFoodLog(meals);
+    setTotalCalories(calorieSum);
+  };
+
+  const guessMealTime = (hour) => {
+    if (hour < 11) return 'breakfast';
+    if (hour < 16) return 'lunch';
+    return 'dinner';
+  };
 
   useEffect(() => {
-    const playDuration = 5000;
-    const intervalDuration = 60000;
-    const playGif = () => {
-      setShowGif(true);
-      setTimeout(() => setShowGif(false), playDuration);
-    };
-    playGif();
-    const interval = setInterval(playGif, intervalDuration);
-    return () => clearInterval(interval);
+    fetchFoodLog();
   }, []);
 
   return (
@@ -149,25 +211,6 @@ const FoodLog = () => {
           )}
         </div>
       ))}
-
-      {/* {showGif && (
-        <div
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            width: '100vw',
-            height: '100vh',
-            backgroundColor: 'rgba(0,0,0,0.8)',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            zIndex: 9999,
-          }}
-        >
-          <img src="/foxy.gif" alt="Fun GIF" style={{ maxWidth: '100%', maxHeight: '100%' }} />
-        </div>
-      )} */}
     </div>
   );
 };

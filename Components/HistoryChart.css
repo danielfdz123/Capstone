@@ -1,0 +1,95 @@
+/* Main layout: UI centered in the middle of the screen when there's no chart */
+.main-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 1rem;
+    box-sizing: border-box;
+    /* border: 1px solid rgb(0, 0, 0); */
+}
+
+/* Exercise form container */
+.exercise-container {
+    max-width: 1200px;
+    width: 100%;
+    padding: 1rem;
+    border-radius: 10px;
+    font-family: Arial, sans-serif;
+    background-color: #2563eb;
+    /* flex-shrink: 0; */
+    border: 1px solid rgb(255, 255, 255);
+}
+
+/* Headings */
+.exercise-heading {
+    text-align: center;
+    margin: 0.5rem;
+    color: white;
+}
+
+/* Form grid */
+.exercise-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px; 
+    justify-content: center; 
+    margin-top: 15px;
+}
+
+/* Inputs */
+.exercise-input {
+    max-width: 300px;
+    max-height: 8px;
+    padding: 10px 8px;
+    font-size: 13px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    margin-left: 10px;
+}
+
+.exercise-input:read-only {
+  cursor: not-allowed;
+}
+
+/* Add button */
+.nextExercise, .nextSet {
+    padding: 8px 10px;
+    font-size: 13px;
+    background-color: #3babf6;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    height:30px;
+}
+
+
+/* Exercise log */
+.exerciseHistoryChart {
+    color: black;
+    display: flex;
+    margin-top: 10px;
+    max-width: 87%;
+    margin-left: 94px;
+    gap: 24px;
+    /* border: 1px solid black; */
+}
+
+.exerciseName, .exerciseSets, .exerciseReps, .exerciseWeight{
+    width: 20%;
+    /* border: 1px solid black; */
+    text-align: left;
+    background-color: #aaaaaa;
+    padding: 8px 12px;
+    border-radius: 4px;
+}
+
+.calendar {
+    border: 1px solid black;
+    background-color: transparent;
+    color: white;
+    padding: 5px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 14px;
+}

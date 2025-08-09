@@ -1,92 +1,139 @@
-// Pages/History.jsx
 import React, { useState, useEffect } from 'react';
 import Navbar from '../Components/Navbar';
-import {supabase} from '../client';
+import HistoryChart from '../Components/HistoryChart';
+import { supabase } from '../client';
 import './History.css';
 
 const History = () => {
-    const [workouts, setWorkouts] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [viewWorkout, setViewWorkout] = useState(null);
+    const [selectedDate, setSelectedDate] = useState('');
+    const [username, setUsername] = useState('');
+    const [showModal, setShowModal] = useState(false);
+
+    const [workoutDays, setWorkoutDays] = useState([]);                     // All workoutDays from the account in the database
+    const [selectedWorkoutDay, setSelectedWorkoutDay] = useState('');       // The selected workout day in the dropdown
+    const [latestWorkoutDateText, setlatestWorkoutDateText] = useState(''); // Most recent workout
 
     useEffect(() => {
-        const fetchWorkouts = async () => {
-            setLoading(true);
-            const {data, error} = await supabase
-                .from('workouts')
-                .select('*')
-                .order('date', {ascending: false});
+        const storedUser = localStorage.getItem('user');
+        const parsedUser = storedUser ? JSON.parse(storedUser) : {};
+        const username_ = parsedUser.username || '';
+        setUsername(username_);
 
-            if (error) {
-                console.error("Error fetching workouts:", error);
-            } else {
-                setWorkouts(data);
+        const modalFlagKey = `fitnessModalShown_${username_}`;
+        const modalShown = localStorage.getItem(modalFlagKey);
+        if (!modalShown && username_) 
+        {
+            setShowModal(true);
+            localStorage.setItem(modalFlagKey, 'true');
+        }
+        
+        const fetchExercise = async () => {
+            const { data: days } = await supabase
+                .from('Exercise')
+                .select('workoutDay', { distinct: true })
+                .eq('username', username_)
+            
+            // Creates array and fills it with a list of names of workout days present in the table
+            const unique = Array.from(new Set((days || []).map(d => (d.workoutDay || '').trim())))
+                .filter(Boolean)
+                .sort();
+            setWorkoutDays(unique);
+
+            // Fetches info from most recent workout when loading the history page
+            const { data: recentWorkout } = await supabase
+                .from('Exercise')
+                .select('date, workoutDay')
+                .eq('username', username_)
+                .order('date', { ascending: false })
+                .limit(1);
+            
+            // UI shows recent workout in EST
+            if (recentWorkout?.length) 
+            {
+                const latestWorkout = recentWorkout[0];
+                setSelectedWorkoutDay(latestWorkout.workoutDay || '');
+                setSelectedDate(
+                    new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York' }).format(new Date(latestWorkout.date))
+                );
+                setlatestWorkoutDateText(
+                    new Date(latestWorkout.date).toLocaleString('en-US', 
+                    {
+                        weekday: 'long', 
+                        year: 'numeric',
+                        month: 'long', 
+                        day: 'numeric', 
+                        timeZone: 'America/New_York',
+                    })
+                );
             }
-            setLoading(false); 
         };
-
-        fetchWorkouts();
+        fetchExercise();
     }, []);
 
-    return (
-        <div className="historyBox">
-            <div className="navDiv">
-                <Navbar />
-            </div>
+    // History changes according to the dropdown selection (Ex: Chest Day, Leg Day, etc)
+    const handleWorkoutDayChange = async (e) => {
+        const day = e.target.value;
+        setSelectedWorkoutDay(day);
+        const { data } = await supabase
+            .from('Exercise')
+            .select('date')
+            .eq('username', username)
+            .eq('workoutDay', day)
+            .order('date', { ascending: false })
+            .limit(1);
 
-            <div className="history-container">
-                <h2> Workout History </h2>
-                {loading ? (
-          <p> Loading workouts... </p>
-        ) : workouts.length === 0 ? (
-          <p> No workouts logged yet! </p>
-        ) : (
-          <table className="workout-table">
-            <thead>
-              <tr>
-                <th> Date </th>
-                <th> # Exercises </th>
-                <th> Action </th>
-              </tr>
-            </thead>
-            <tbody>
-              {workouts.map((workout) => (
-                <tr key={workout.id || workout._id}>
-                  <td> {new Date(workout.date).toLocaleDateString()} </td>
-                  <td> {workout.exercises?.length || 0} </td>
-                  <td>
-                    <button onClick={() => setViewWorkout(workout)}> View </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-        {/* Modal to display the entire workout after clicking the "View" button */}
-        {viewWorkout && (
-          <div className="modal-backdrop" onClick={() => setViewWorkout(null)}>
-            <div
-              className="modal-content"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <h3>Workout on {new Date(viewWorkout.date).toLocaleDateString()}</h3>
-              <button className="close-button" onClick={() => setViewWorkout(null)}>
-                Close
-              </button>
-              <ul>
-                {viewWorkout.exercises.map((ex, idx) => (
-                  <li key={idx}>
-                    <strong> {ex.name} </strong>: {ex.sets} sets x {ex.reps} reps{' '}
-                    {ex.weight ? `@ ${ex.weight} lb` : ''}
-                  </li>
-                ))}
-              </ul>
+        if (data?.length) 
+        {
+            const workoutDate = new Date(data[0].date);
+            setSelectedDate(
+                new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York' }).format(workoutDate));
+            setlatestWorkoutDateText(
+                workoutDate.toLocaleString('en-US', {
+                weekday: 'long',
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric', 
+                timeZone: 'America/New_York',
+                })
+            );
+        }
+    };
+
+    return (
+        <>
+            {/* WELCOME MESSAGE - Only shows once per new account */}
+            {showModal && (
+                <div className = "welcomeDiv">
+                    <div className = "welcomeMsg">
+                        <h1>📁 Welcome to the History Page! 📁 </h1>
+                        <p> View all your past workouts. </p>
+                        <button onClick={() => setShowModal(false)}> Sounds Good! </button>
+                    </div>
+                </div>
+            )}
+
+            <div className = "historyBox">
+                {/* IMPORT NAVBAR COMPONENT */}
+                <div className = "navDiv">
+                    <Navbar />
+                </div>
+
+                {/* CONTENT TEXT */}
+                <div className = "historyContent">
+                    <h3 className = "intro">
+                        {selectedWorkoutDay && latestWorkoutDateText? 
+                        <> Your most recent workout was{' '}
+                            <select className = "daySelect" value={selectedWorkoutDay} onChange={handleWorkoutDayChange}>
+                                {workoutDays.map(day => <option key={day} value={day}>{day}</option>)}
+                            </select>{' '}on {latestWorkoutDateText}.
+                        </>
+                        : 'No workouts logged yet. Start by logging your very first exercise!'}
+                    </h3>
+                    <HistoryChart username={username} selectedDate = {selectedDate} onSelectedDateChange={setSelectedDate}/>
+                </div>
             </div>
-          </div>
-        )}
-      </div>
-    </div>
-  );
+        </>
+    );
 };
 
 export default History;

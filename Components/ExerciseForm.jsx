@@ -41,6 +41,10 @@ const ExerciseForm = ({ username, onExerciseLogged }) => {
             alert('Finish your current set before moving onto the next one.');
             return;
         }
+        if (!exerciseDay.trim()) {
+            alert('Specify what your workout day is before moving on.');
+            return;
+        }
         setSetDetails([...setDetails, { reps, weight }]);
         setExercise({
             ...exercise,
@@ -54,7 +58,12 @@ const ExerciseForm = ({ username, onExerciseLogged }) => {
         e.preventDefault();
         const { name } = exercise;
         if (!name || setDetails.length === 0) {
-            alert('Please complete at least one set before moving onto the next exercise!');
+            alert('Please enter at least one complete set before moving onto the next exercise!');
+            return;
+        }
+        if (!exerciseDay.trim()) 
+        {
+            alert('Please enter a workout day before adding an exercise!');
             return;
         }
 
@@ -90,7 +99,7 @@ const ExerciseForm = ({ username, onExerciseLogged }) => {
             <div className = "exercise-container">
                 <h2 className = "exercise-heading">🏋️ Add Exercise </h2>
 
-                {/* SPECIFY WORKOUT DAY CONTENT  */}
+                {/* ADDING EXERCISE CONTENT  */}
                 <h4 className = "exerciseDay">
                     Today is:
                     <input
@@ -103,8 +112,8 @@ const ExerciseForm = ({ username, onExerciseLogged }) => {
                     />
                 </h4>
 
-                {/* ADDING EXERCISE CONTENT  */}
-                <form className = "exercise-form">
+
+                <form className = "exercise-form">                    
                     <input
                         className = "exercise-input"
                         type = "text"
@@ -140,15 +149,15 @@ const ExerciseForm = ({ username, onExerciseLogged }) => {
                         onChange = {handleChange}
                         required
                     />
-                    <button className = "nextSet" onClick={handleNextSet}>Next Set</button>
-                    <button className = "nextExercise" onClick={handleNextExercise}>Next Exercise</button>
+                    <button className = "nextSet" type = 'submit' onClick={handleNextSet}>Next Set</button>
+                    <button className = "nextExercise" type = 'submit' onClick={handleNextExercise}>Next Exercise</button>
                 </form>
 
                 {/* HISTOTY CONTENT  */}
                 {exerciseList.map((ex, index) => (
                     <div className = "exerciseHistory" key={index}>
                         <div className = "exerciseName"> {ex.exercise} </div>
-                        <div className = "exerciseSets"> {ex.sets} sets </div>
+                        <div className = "exerciseSets"> {ex.sets} {ex.sets === 1 ? 'set' : 'sets'} </div>
                         <div className = "exerciseReps"> Reps: {Array.isArray(ex.reps) ? ex.reps.join(', ') : ex.reps} </div>
                         <div className = "exerciseWeight"> {Array.isArray(ex.weight) ? ex.weight.join(', ') : ex.weight} lbs </div>
                     </div>

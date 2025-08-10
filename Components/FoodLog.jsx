@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { supabase } from '../client'; // ✅ CHANGED
+import { supabase } from '../client';
 import './FoodLog.css';
 
 const FoodLog = () => {
@@ -10,7 +10,7 @@ const FoodLog = () => {
   });
 
   const [totalCalories, setTotalCalories] = useState(0);
-  const [username] = useState('your_username'); // ✅ CHANGED — ideally fetch from auth
+  const [username, setUsername] = useState(null);
 
   const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
 
@@ -84,16 +84,97 @@ const FoodLog = () => {
 
   const foodOptions = distributeFoods(fullFoodList);
 
+  // Get current logged in user's email from supabase auth session
+  const getUsernameFromEmail = async (email) => {
+    if (!email) return null;
+    const { data, error } = await supabase
+      .from('Accounts')
+      .select('username')
+      .eq('email', email)
+      .single();
+
+    if (error) {
+      console.error('Error fetching username from Accounts:', error);
+      return null;
+    }
+    return data?.username || null;
+  };
+
+  // On mount, get current user's username dynamically
+  useEffect(() => {
+    const fetchUsername = async () => {
+      const user = supabase.auth.user();
+      if (!user?.email) {
+        console.warn('No authenticated user found.');
+        return;
+      }
+      const usernameFromDB = await getUsernameFromEmail(user.email);
+      setUsername(usernameFromDB);
+    };
+    fetchUsername();
+  }, []);
+
+  // Fetch food log only after username is set
+  useEffect(() => {
+    if (!username) return;
+
+    const fetchFoodLog = async () => {
+      const { data, error } = await supabase
+        .from('Diet')
+        .select('*')
+        .eq('username', username)
+        .gte('date', `${today}T00:00:00`)
+        .lte('date', `${today}T23:59:59`);
+
+      if (error) {
+        console.error('Error fetching from Supabase:', error);
+        return;
+      }
+
+      const meals = {
+        breakfast: [],
+        lunch: [],
+        dinner: [],
+      };
+
+      let calorieSum = 0;
+
+      data.forEach(entry => {
+        const food = fullFoodList.find(f => f.name === entry.food);
+        if (food) {
+          const mealType = guessMealTime(new Date(entry.date).getHours());
+          meals[mealType].push(food);
+          calorieSum += food.calories;
+        }
+      });
+
+      setFoodLog(meals);
+      setTotalCalories(calorieSum);
+    };
+
+    fetchFoodLog();
+  }, [username]);
+
+  const guessMealTime = (hour) => {
+    if (hour < 11) return 'breakfast';
+    if (hour < 16) return 'lunch';
+    return 'dinner';
+  };
+
   const handleAddFood = async (meal, food) => {
+    if (!username) {
+      alert('Username not loaded yet. Please try again shortly.');
+      return;
+    }
+
     const updatedMeal = [...foodLog[meal], food];
     const updatedFoodLog = { ...foodLog, [meal]: updatedMeal };
     setFoodLog(updatedFoodLog);
     setTotalCalories(prev => prev + food.calories);
 
-    // ✅ INSERT into Supabase
     const { error } = await supabase.from('Diet').insert({
       username,
-      date: new Date().toISOString(), // full timestamp
+      date: new Date().toISOString(),
       food: food.name,
       foodCount: 1,
       calories: food.calories,
@@ -105,13 +186,17 @@ const FoodLog = () => {
   };
 
   const handleDeleteFood = async (meal, index) => {
+    if (!username) {
+      alert('Username not loaded yet. Please try again shortly.');
+      return;
+    }
+
     const removedFood = foodLog[meal][index];
     const updatedMeal = foodLog[meal].filter((_, i) => i !== index);
     const updatedFoodLog = { ...foodLog, [meal]: updatedMeal };
     setFoodLog(updatedFoodLog);
     setTotalCalories(prev => prev - removedFood.calories);
 
-    // ✅ DELETE from Supabase — you can improve this with unique IDs
     const { error } = await supabase
       .from('Diet')
       .delete()
@@ -119,57 +204,14 @@ const FoodLog = () => {
         username,
         food: removedFood.name,
         calories: removedFood.calories,
-        date: removedFood.date || today, // attempt to match on date
+        // Using only date part to match
+        date: removedFood.date ? removedFood.date.split('T')[0] : today,
       });
 
     if (error) {
       console.error('Error deleting from Supabase:', error);
     }
   };
-
-  const fetchFoodLog = async () => {
-    const { data, error } = await supabase
-      .from('Diet')
-      .select('*')
-      .eq('username', username)
-      .gte('date', `${today}T00:00:00`)
-      .lte('date', `${today}T23:59:59`);
-
-    if (error) {
-      console.error('Error fetching from Supabase:', error);
-      return;
-    }
-
-    const meals = {
-      breakfast: [],
-      lunch: [],
-      dinner: [],
-    };
-
-    let calorieSum = 0;
-
-    data.forEach(entry => {
-      const food = fullFoodList.find(f => f.name === entry.food);
-      if (food) {
-        const mealType = guessMealTime(new Date(entry.date).getHours());
-        meals[mealType].push(food);
-        calorieSum += food.calories;
-      }
-    });
-
-    setFoodLog(meals);
-    setTotalCalories(calorieSum);
-  };
-
-  const guessMealTime = (hour) => {
-    if (hour < 11) return 'breakfast';
-    if (hour < 16) return 'lunch';
-    return 'dinner';
-  };
-
-  useEffect(() => {
-    fetchFoodLog();
-  }, []);
 
   return (
     <div className="exercise-container">
@@ -216,3 +258,4 @@ const FoodLog = () => {
 };
 
 export default FoodLog;
+

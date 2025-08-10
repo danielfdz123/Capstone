@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '../client';
 import './FoodLog.css';
 
+//omw to the liqa sto
+
 const FoodLog = () => {
   const [foodLog, setFoodLog] = useState({
     breakfast: [],

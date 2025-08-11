@@ -1,30 +1,9 @@
-/*
-.dietBox {
-  max-width: 900px;
-  margin: 1rem auto;
-  padding: 1rem;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  color: #0a2540;
-  background-color: #f9fafb;
-  border-radius: 12px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+.dietContent {
+  background-color: #3B4452;
+    color: white;
+    padding: 10px;
+    border-radius: 20px;
+    height: 658px;
+    max-height: 658px;
+    font-family: 'Segoe UI', sans-serif;
 }
-
-.navDiv {
-  background-color: #1e90ff;
-  padding: 12px 20px;
-  color: white;
-  font-weight: 600;
-  font-size: 22px;
-  border-radius: 8px;
-  margin-bottom: 1rem;
-}
-
-.foodLogContainer {
-  background-color: #fff;
-  padding: 15px 20px;
-  border-radius: 10px;
-  box-shadow: 1px 1px 6px rgba(0,0,0,0.1);
-  min-height: 400px;
-}
-*/

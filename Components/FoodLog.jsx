@@ -1,14 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import { supabase } from '../client'; 
+// src/Components/FoodLog.jsx
+import React, { useState, useEffect, useCallback } from 'react';
+import { supabase } from '../client';
 import './FoodLog.css';
 
-const FoodLog = () => {
-  const [username, setUsername] = useState(null);
-  const [foodLog, setFoodLog] = useState({ breakfast: [], lunch: [], dinner: [] });
-  const [totalCalories, setTotalCalories] = useState(0);
-
+const FoodLog = ({ username, onFoodLogged }) => {
+  const [mealType, setMealType] = useState('');                 
+  const [foodEntry, setFoodEntry] = useState({ name: '', quantity: 1 });
+  const [dietList, setDietList] = useState([]);    
+  
   const today = new Date();
-  const formattedDate = today.toISOString().split('T')[0]; // 'YYYY-MM-DD'
+  const formattedDate = today.toISOString().split('T')[0];
+  const endTime = new Date(today.getTime() + 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+
 
   const fullFoodList = [
     { name: 'Apple', calories: 95, serving: '1 medium' },
@@ -69,194 +72,146 @@ const FoodLog = () => {
     { name: 'Crackers', calories: 16, serving: '1 cracker' },
   ];
 
-  // Split fullFoodList into 3 parts for breakfast, lunch, dinner dropdowns
   const distributeFoods = (foods) => {
     const perMeal = Math.ceil(foods.length / 3);
     return {
-      breakfast: foods.slice(0, perMeal),
-      lunch: foods.slice(perMeal, perMeal * 2),
-      dinner: foods.slice(perMeal * 2),
+      Breakfast: foods.slice(0, perMeal),
+      Lunch: foods.slice(perMeal, perMeal * 2),
+      Dinner: foods.slice(perMeal * 2),
     };
   };
 
   const foodOptions = distributeFoods(fullFoodList);
-
-  // Guess meal type by hour of day
-  const guessMealTime = (hour) => {
-    if (hour < 11) return 'breakfast';
-    if (hour < 16) return 'lunch';
-    return 'dinner';
+  const get24HourRange = () => 
+  {
+    return {formattedDate, endTime};
   };
 
-  // Fetch username once on mount
-  useEffect(() => {
-    const fetchUsername = async () => {
-      const { data, error } = await supabase
-        .from('Accounts')
-        .select('username')
-        .limit(1)
-        .single();
-
-      if (error) {
-        console.error('Error fetching username:', error);
-        return;
-      }
-
-      setUsername(data.username);
-    };
-
-    fetchUsername();
-  }, []);
-
-  // Fetch food log once username is set
-  useEffect(() => {
+  // Fetch diet info from todays 24hr time period
+  const fetchTodayDiet = useCallback(async () => {
     if (!username) return;
+    const { formattedDate, endTime } = get24HourRange();
 
-    const fetchFoodLog = async () => {
-      const startOfDay = `${formattedDate}T00:00:00Z`;
-      const endOfDay = `${formattedDate}T23:59:59Z`;
-
-      const { data, error } = await supabase
-        .from('Diet')
-        .select('*')
-        .eq('username', username)
-        .gte('date', startOfDay)
-        .lte('date', endOfDay);
-
-      if (error) {
-        console.error('Error fetching food log:', error);
-        return;
-      }
-
-      const meals = { breakfast: [], lunch: [], dinner: [] };
-      let calorieSum = 0;
-
-      data.forEach(entry => {
-        const food = fullFoodList.find(f => f.name === entry.food);
-        if (food) {
-          const mealType = guessMealTime(new Date(entry.date).getHours());
-          meals[mealType].push(food);
-          calorieSum += food.calories;
-        }
-      });
-
-      setFoodLog(meals);
-      setTotalCalories(calorieSum);
-    };
-
-    fetchFoodLog();
-  }, [username, formattedDate]);
-
-  // Add food handler
-  const handleAddFood = async (meal, food) => {
-    if (!username) {
-      console.warn('No username available yet.');
-      return;
-    }
-
-    // Update state locally
-    const updatedMeal = [...foodLog[meal], food];
-    const updatedFoodLog = { ...foodLog, [meal]: updatedMeal };
-    setFoodLog(updatedFoodLog);
-    setTotalCalories(prev => prev + food.calories);
-
-    // Insert into Supabase
-    const { error } = await supabase.from('Diet').insert({
-      username,
-      date: new Date().toISOString(),
-      food: food.name,
-      foodCount: 1,
-      calories: food.calories,
-    });
-
-    if (error) {
-      console.error('Error inserting into Supabase:', error);
-    }
-  };
-
-  // Delete food handler
-  const handleDeleteFood = async (meal, index) => {
-    const removedFood = foodLog[meal][index];
-    if (!removedFood) return;
-
-    // Update state locally
-    const updatedMeal = foodLog[meal].filter((_, i) => i !== index);
-    const updatedFoodLog = { ...foodLog, [meal]: updatedMeal };
-    setFoodLog(updatedFoodLog);
-    setTotalCalories(prev => prev - removedFood.calories);
-
-    // Delete from Supabase - find the matching row to delete by username, food, and date range
-    const startOfDay = `${formattedDate}T00:00:00Z`;
-    const endOfDay = `${formattedDate}T23:59:59Z`;
-
-    // Find the record id to delete
     const { data, error } = await supabase
       .from('Diet')
-      .select('id')
+      .select('id, date, food, foodCount, calories')
       .eq('username', username)
-      .eq('food', removedFood.name)
-      .gte('date', startOfDay)
-      .lte('date', endOfDay)
-      .limit(1);
+      .gte('date', formattedDate)
+      .lt('date', endTime);
+    const rows = data || [];
+    setDietList(rows);
 
-    if (error) {
-      console.error('Error finding record to delete:', error);
-      return;
+    const count = rows.reduce((sum, r) => sum + (Number(r.foodCount) || 0), 0);
+    const calories = rows.reduce((acc, r) => acc + (Number(r.calories) || 0), 0);
+    if (typeof onFoodLogged === 'function') 
+    {
+      onFoodLogged({ count, calories });
     }
-    if (!data || data.length === 0) return;
+  }, [username, onFoodLogged]);
 
-    const recordId = data[0].id;
+  useEffect(() => {
+    fetchTodayDiet();
+  }, [fetchTodayDiet]);
 
-    const { error: deleteError } = await supabase
-      .from('Diet')
-      .delete()
-      .eq('id', recordId);
-
-    if (deleteError) {
-      console.error('Error deleting record:', deleteError);
-    }
+  const handleQuantityChange = (e) => {
+    const amount = Math.max(1, Number(e.target.value) || 1);
+    setFoodEntry((prev) => ({ ...prev, quantity: amount }));
   };
 
-  if (!username) return <div>Loading username...</div>;
+  const saveMeal = async (e) => {
+    e.preventDefault();
+    if (!mealType.trim()) return alert('Please select a meal type.');
+    if (!foodEntry.name) return alert('Please select a food item.');
+
+    const base = fullFoodList.find((f) => f.name === foodEntry.name)?.calories || 0;
+    const amount = foodEntry.quantity || 1;
+    const totalCalories = base * amount;
+
+    const row = {
+      username,
+      date: new Date().toISOString(),
+      food: foodEntry.name,
+      foodCount: amount,
+      calories: totalCalories,
+    };
+    await supabase.from('Diet').insert([row]);
+    await fetchTodayDiet();
+  };
+
+  const currentOptions =
+    mealType && foodOptions[mealType] ? foodOptions[mealType] : [];
+
+  const previewCalories = (() => {
+    if (!foodEntry.name) return '';
+    const base = fullFoodList.find((f) => f.name === foodEntry.name)?.calories || 0;
+    return `${base * (foodEntry.quantity || 1)} cal`;
+  })();
 
   return (
-    <div className="foodlog-container">
-      <h1 style={{ color: 'white' }}>Food Log for {username}</h1>
-      <h2 style={{ color: 'white' }}>Total Calories: {totalCalories}</h2>
+    <div className = "main-layout">
+      <div className = "dietDiv">
+        <h2 className = "dietHeading"> 🍽️ Add Food</h2>
 
-      {['breakfast', 'lunch', 'dinner'].map((meal) => (
-        <div key={meal} className="meal-section" style={{ color: 'white' }}>
-          <h3 style={{ color: 'white' }}>{meal.charAt(0).toUpperCase() + meal.slice(1)}</h3>
+        <h4 className = "meal">
+          Current Meal:
           <select
-            style={{ color: 'black' }}  // keep text black inside select for readability
-            onChange={(e) => {
-              const foodName = e.target.value;
-              if (foodName === '') return;
-              const selectedFood = foodOptions[meal].find(f => f.name === foodName);
-              if (selectedFood) {
-                handleAddFood(meal, selectedFood);
-              }
-              e.target.value = ''; // Reset select after choosing
-            }}
-        >
-            <option value="">-- Select Food --</option>
-            {foodOptions[meal].map(food => (
+            className = "mealInput"
+            value = {mealType}
+            onChange = {(e) => setMealType(e.target.value)}
+          >
+            <option value = ""> Select Meal </option>
+            <option value = "Breakfast"> Breakfast </option>
+            <option value = "Lunch"> Lunch </option>
+            <option value = "Dinner"> Dinner </option>
+          </select>
+        </h4>
+
+        <form className = "mealForm">
+          <select
+            className = "mealSelect"
+            value={foodEntry.name}
+            onChange={(e) => setFoodEntry({ ...foodEntry, name: e.target.value })}
+            disabled={!mealType}
+          >
+            <option value="">{mealType ? `Select ${mealType} Item` : 'Select Meal first'}</option>
+            {currentOptions.map((food) => (
               <option key={food.name} value={food.name}>
                 {food.name} ({food.calories} cal)
               </option>
             ))}
           </select>
 
-          <ul>
-            {foodLog[meal].map((food, i) => (
-              <li key={`${meal}-${i}`} style={{ color: 'white' }}>
-                {food.name} - {food.calories} cal{' '}
-                <button onClick={() => handleDeleteFood(meal, i)}>Delete</button>
-              </li>
-            ))}
-          </ul>
-        </div>
-      ))}
+          <input
+            className="foodInput"
+            type="number"
+            min="1"
+            value={foodEntry.quantity}
+            onChange={handleQuantityChange}
+            disabled={!mealType}
+          />
+
+          <input
+            className="foodInput"
+            type="text"
+            value={previewCalories}
+            placeholder="Calories"
+            readOnly
+          />
+
+          <button className = "nextSet" type="button" onClick={saveMeal}>
+            Log Meal
+          </button>
+        </form>
+
+        {/* HISTOTY CONTENT  */}
+        {dietList.map((row) => (
+          <div className = "dietHistory" key={row.id}>
+            <div className = "foodName"> {row.food} </div>
+            <div className = "foodQuantity"> x{row.foodCount} </div>
+            <div className = "foodName"> {row.calories} calories</div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

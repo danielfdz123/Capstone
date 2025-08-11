@@ -16,6 +16,10 @@ const Home = () => {
     const [showModal, setShowModal] = useState(false);
     const [exerciseCount, setExerciseCount] = useState(0);
 
+    const [consumedCalories, setConsumedCalories] = useState(0);   
+    const [caloriesRemaining, setCaloriesRemaining] = useState(0);
+    const [caloriesPercent, setCaloriesPercent] = useState(0);    
+
     useEffect(() => {
         const storedUser = localStorage.getItem('user');
         const parsedUser = JSON.parse(storedUser);
@@ -78,6 +82,46 @@ const Home = () => {
         fetchExerciseCount();
     }, []);
 
+    useEffect(() => {
+        const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
+        const username = storedUser?.username || '';
+        if (!username) return;
+
+        const fetchTodaysCalories = async () => {
+            const now = new Date();
+            const todayStr = now.toISOString().split('T')[0];
+            const tomorrowStr = new Date(now.getTime() + 24 * 60 * 60 * 1000)
+                .toISOString()
+                .split('T')[0];
+
+            const { data, error } = await supabase
+                .from('Diet')
+                .select('calories')
+                .eq('username', username)
+                .gte('date', todayStr)
+                .lt('date', tomorrowStr);
+
+            if (error) {
+                console.error('Error fetching today calories:', error);
+                return;
+            }
+
+            const consumed = (data || []).reduce((sum, r) => sum + (Number(r.calories) || 0), 0);
+            setConsumedCalories(consumed);
+
+            const goal = Number(calorieGoal) || 0;
+            const remaining = Math.max(0, goal - consumed);
+            setCaloriesRemaining(remaining);
+
+            const percent = goal > 0
+                ? Math.min(100, Math.max(0, Math.round((consumed / goal) * 100)))
+                : 0;
+            setCaloriesPercent(percent);
+        };
+
+        fetchTodaysCalories();
+    }, [calorieGoal]);
+
     const computeWeightProgressPercent = (start, current, goal) => {
         const startWeight = Number(start);
         const currentWeight = Number(current);
@@ -98,6 +142,8 @@ const Home = () => {
         return Math.round((achieved / total) * 100);
     };
     const weightProgressPercent = computeWeightProgressPercent(weight, progressWeight, weightGoal);
+
+    
 
     return (
     <>
@@ -132,10 +178,10 @@ const Home = () => {
                     {/* CALORIES INFO */}
                     <div className = "card">
                         <h3> Calories Remaining: </h3>
-                        <h2> 2100 </h2>
-                        <p> Goal: {calorieGoal} | Consumed: 0 </p>
+                        <h2> {caloriesRemaining && caloriesRemaining !== 0 ? caloriesRemaining : 10000} </h2>
+                        <p> Goal: {calorieGoal} | Consumed: {consumedCalories} </p>
                         <div className = "progressBar">
-                            {/* Need to figure out how to make this work, would be cool tbh */}
+                            <div className = "progressFill" style={{ width: `${caloriesPercent}%` }} />
                         </div>
                     </div>
 
@@ -149,7 +195,7 @@ const Home = () => {
                     {/* WEIGHT PROGRESS INFO */}
                     <div className = "card">
                         <h3> Weight Progress: </h3>
-                        <h2> {progressWeight} lbs</h2>
+                        <h2> {progressWeight && progressWeight !== 0 ? progressWeight : weight} lbs</h2>
                         <p> Start: {weight} lbs | Goal: {weightGoal} lbs</p>
                         <div className = "progressBar">
                             <div className = "progressFill" style={{ width: `${weightProgressPercent}%` }}/>

@@ -120,9 +120,9 @@ This project is licensed under the MIT License. See [LICENSE](LICENSE) for detai
 ## Authors
 
 * **Team Capstone**
-
+  * Daniel Fernandez
   * Afif Hamim (@afif978)
   * Takibur Chowdhury (@Taki127)
-  * Jason Weng (@J-AS0N
+  * Jason Weng (@J-AS0N)
   * Kevin Weng (@K-EV1N)
 

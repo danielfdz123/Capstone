@@ -121,6 +121,7 @@ This project is licensed under the MIT License. See [LICENSE](LICENSE) for detai
 
 * **Team Capstone**
 
+  * Daniel Fernandez (@danielfdz123)
   * Afif Hamim (@afif978)
   * Takibur Chowdhury (@Taki127)
   * Jason Weng (@J-AS0N

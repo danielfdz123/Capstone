@@ -10,6 +10,9 @@ const ExerciseForm = ({ username, onExerciseLogged }) => {
     const [setDetails, setSetDetails] = useState([]);
     const [exerciseList, setExerciseList] = useState([]);
 
+    const [bodyWeight, setBodyWeight] = useState('');
+    const [caloriesBurned, setCaloriesBurned] = useState('');
+
     const today = new Date();
     const formattedDate = today.toISOString().split('T')[0];
 
@@ -54,7 +57,23 @@ const ExerciseForm = ({ username, onExerciseLogged }) => {
         });
     };
 
-    const handleNextExercise = async (e) => {
+    const handleSaveStats = async () => {
+        if (!username) return;
+        const caloriesNumber =
+        caloriesBurned === '' || isNaN(Number(caloriesBurned)) ? null : Number(caloriesBurned);
+
+        await supabase
+            .from('Stats')
+            .update({
+                progressWeight: bodyWeight === '' ? null : bodyWeight,
+                caloriesBurned: caloriesNumber
+            })
+            .eq('username', username)
+        .select();
+        alert('Stats saved successfully!');
+  };
+
+   const handleNextExercise = async (e) => {
         e.preventDefault();
         const { name } = exercise;
         if (!name || setDetails.length === 0) {
@@ -100,18 +119,41 @@ const ExerciseForm = ({ username, onExerciseLogged }) => {
                 <h2 className = "exercise-heading">🏋️ Add Exercise </h2>
 
                 {/* ADDING EXERCISE CONTENT  */}
-                <h4 className = "exerciseDay">
-                    Today is:
-                    <input
-                        className = "exercise-input"
-                        placeholder = "Ex: Chest Day"
-                        value = {exerciseDay}
-                        onChange = {(e) => setExerciseDay(e.target.value)}
-                        required
-                        readOnly = {exercise.sets > 1}
-                    />
-                </h4>
+                <div className = "important">
+                    <h4 className = "exerciseDay">
+                        Today is:
+                        <input
+                            className = "exercise-input"
+                            placeholder = "Ex: Chest Day"
+                            value = {exerciseDay}
+                            onChange = {(e) => setExerciseDay(e.target.value)}
+                            required
+                            readOnly = {exercise.sets > 1}
+                        />
+                    </h4>
 
+                    <h4 className = "otherStuff">
+                        *Fill out after workout:
+                        <input
+                            className = "exercise-input"
+                            type = "number"
+                            placeholder = "Body Weight"
+                            value = {bodyWeight}
+                            onChange = {(e) => setBodyWeight(e.target.value)}
+                        />
+                        <input
+                            className = "exercise-input"
+                            type = "number"
+                            placeholder = "Calories Burned (est)"
+                            value = {caloriesBurned}
+                            onChange = {(e) => setCaloriesBurned(e.target.value)}
+                        />
+
+                        <button className = "saveStats" type="button" onClick={handleSaveStats}>
+                            Save Stats
+                        </button>
+                    </h4>
+                </div>
 
                 <form className = "exercise-form">                    
                     <input

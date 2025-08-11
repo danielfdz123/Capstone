@@ -19,7 +19,7 @@ const History = () => {
         const username_ = parsedUser.username || '';
         setUsername(username_);
 
-        const modalFlagKey = `fitnessModalShown_${username_}`;
+        const modalFlagKey = `historyModalShown_${username_}`;
         const modalShown = localStorage.getItem(modalFlagKey);
         if (!modalShown && username_) 
         {
@@ -106,7 +106,10 @@ const History = () => {
                 <div className = "welcomeDiv">
                     <div className = "welcomeMsg">
                         <h1>📁 Welcome to the History Page! 📁 </h1>
-                        <p> View all your past workouts. </p>
+                        <p> View all your past workouts here! </p>
+                        <p> Either navigate through the dates to view your workouts for set days </p>
+                        <p> Or hit the dropdown to see when you last did a speficic workout! </p>
+                        <p> For new users, nothing will show so get to work and log your first workout! </p>
                         <button onClick={() => setShowModal(false)}> Sounds Good! </button>
                     </div>
                 </div>

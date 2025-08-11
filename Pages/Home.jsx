@@ -11,6 +11,7 @@ const Home = () => {
     const [userFirstName, setUserFirstName] = useState('');
     const [calorieGoal, setCalorieGoal] = useState('');
     const [weight, setCurrentWeight] = useState('');
+    const [progressWeight, setProgressWeight] = useState('');
     const [weightGoal, setWeightGoal] = useState('');
     const [showModal, setShowModal] = useState(false);
     const [exerciseCount, setExerciseCount] = useState(0);
@@ -53,6 +54,7 @@ const Home = () => {
                 setUserFirstName(data.first_name || 'User');
                 setCalorieGoal(data.calorieGoal || 0 );
                 setCurrentWeight(data.currentWeight);
+                setProgressWeight(data.progressWeight);
                 setWeightGoal(data.weightGoal);
             }
         };
@@ -74,7 +76,28 @@ const Home = () => {
             }
         };
         fetchExerciseCount();
-        }, []);
+    }, []);
+
+    const computeWeightProgressPercent = (start, current, goal) => {
+        const startWeight = Number(start);
+        const currentWeight = Number(current);
+        const goalWeight = Number(goal);
+
+        if ([startWeight, currentWeight, goalWeight].some((v) => Number.isNaN(v))) {
+            return 0;
+        }
+        if (startWeight === goalWeight) {
+            return 100;
+        }
+        const total = Math.abs(goalWeight - startWeight);
+
+        // Manages any gain/loss in weight
+        const progressMade = goalWeight > startWeight ? (currentWeight - startWeight) : (startWeight - currentWeight);
+        const achieved = Math.min(total, Math.max(0, progressMade));
+
+        return Math.round((achieved / total) * 100);
+    };
+    const weightProgressPercent = computeWeightProgressPercent(weight, progressWeight, weightGoal);
 
     return (
     <>
@@ -126,10 +149,10 @@ const Home = () => {
                     {/* WEIGHT PROGRESS INFO */}
                     <div className = "card">
                         <h3> Weight Progress: </h3>
-                        <h2> {weight} lbs</h2>
-                        <p> Weight Goal: {weightGoal} lbs</p>
+                        <h2> {progressWeight} lbs</h2>
+                        <p> Start: {weight} lbs | Goal: {weightGoal} lbs</p>
                         <div className = "progressBar">
-                            {/* Need to figure out how to make this work, would be cool tbh */}
+                            <div className = "progressFill" style={{ width: `${weightProgressPercent}%` }}/>
                         </div>
                     </div>
                 </div>

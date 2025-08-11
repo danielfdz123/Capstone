@@ -2,6 +2,8 @@
 
 A web-based fitness tracker that lets users create an account, log workouts, and visualize progress over time.
 
+WEBSITE LINK: https://capstone-fitformula.netlify.app/
+
 ---
 
 ## 📋 Table of Contents

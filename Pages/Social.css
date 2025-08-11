@@ -1,60 +1,59 @@
-.social-page {
+.socialContent {
+    background-color: #3B4452;
     color: white;
-    padding: 2rem;
-    text-align: center;
-  }
-  
-  .friend-list {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 1rem;
-  }
-  
-  .friend-card {
-    background-color: #2e2e2e;
-    padding: 1rem 2rem;
-    border-radius: 10px;
-    box-shadow: 0 0 10px #00bcd4;
-    color: white;
-    transition: 0.3s ease;
-  }
-  
-  .friend-card:hover {
-    transform: scale(1.05);
-  }
-  
-  .friend-card button {
-    margin-top: 10px;
-    background-color: #00bcd4;
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 5px;
-    color: white;
-    cursor: pointer;
-  }
-
-  .social-page {
-    color: white;
-    padding: 2rem;
-    max-width: 800px;
-    margin: auto;
-  }
-  
-  .friend-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    margin-bottom: 2rem;
-  }
-  
-  .friend-search {
-    width: 100%;
-    padding: 0.5rem 1rem;
-    margin-bottom: 1rem;
+    padding: 10px;
     border-radius: 20px;
-    border: none;
+    height: 658px;
+    max-height: 658px;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.searchViewDiv {
+  margin-top: 20px;
+    display: flex;
+    margin-bottom: 30px;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    /* border: 1px solid black; */
+}
+
+.searchBar {
+    flex: 1; 
+    max-width: 300px;
+    padding: 8px 12px;
+    border-radius: 6px;
     font-size: 1rem;
-  }
-  
-  
+    border: 1px solid #ccc;
+}
+
+.viewDiv {
+    display: flex;
+    gap: 8px;
+}
+
+.viewButtons {
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    background: white;
+    cursor: pointer;
+}
+
+.viewButtons.active {
+    background: #4a90e2;
+    color: white;
+}
+
+.viewAccounts {
+    padding: 0 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, 290px);
+    gap: 16px;
+    justify-content: left;
+}
+
+.noUsersFound {
+    grid-column: 1 / -1;
+    text-align: center;
+}

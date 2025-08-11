@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { supabase } from '../client'; // ✅ CHANGED
+import { supabase } from '../client';
 import './FoodLog.css';
 
 const FoodLog = () => {
@@ -10,7 +10,7 @@ const FoodLog = () => {
   });
 
   const [totalCalories, setTotalCalories] = useState(0);
-  const [username] = useState('your_username'); // ✅ CHANGED — ideally fetch from auth
+  const [username] = useState('');
 
   const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
 

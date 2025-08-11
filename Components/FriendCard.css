@@ -1,19 +1,67 @@
-/* Components/FriendCard.css */
+.accountCard {
+	background: #fff;
+	grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+	display: flex;
+	padding: 12px;
+	border-radius: 10px;
+	justify-content: space-between;
+	align-items: center;
+	border: 1px solid #e5e7eb;
+	max-width: 275px;
+}
 
-.friend-card {
-    background-color: #2e2e2e;
-    padding: 1rem;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 188, 212, 0.5);
-    color: #fff;
-  }
-  
-  .friend-card button {
-    margin-top: 0.5rem;
-    background-color: #00bcd4;
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  
+.accountInfo { 
+	display: flex; 
+	align-items: center; 
+	gap: 12px; 
+}
+
+.accountPFP {
+  	width: 44px; 
+  	height: 44px; 
+  	border-radius: 50%; 
+  	object-fit: cover;
+  	background: #d6d8db;
+  	display: grid; 
+  	place-items: center; 
+  	font-weight: 600; 
+  	color: #475467;
+}
+
+.accountInfoText { 
+	line-height: 1.2; 
+}
+
+.accountFirstName { 
+
+  	font-weight: 600; 
+  	color: #667085;
+	text-align: left;
+}
+
+.accountUsername { 
+	font-size: 0.9rem; 
+	color: #667085; 
+	text-align: left;
+}
+
+.toggle {
+  	padding: 8px 12px; 
+	border-radius: 8px; 
+	cursor: pointer;
+  	border: 1px solid #d0d5dd; 
+	background: #fff; 
+	font-weight: 500;
+}
+.toggle.follow { 
+	border-color: #4a90e2; 
+}
+
+.toggle.unfollow { 
+	border-color: #ef4444; 
+}
+
+.toggle:disabled { 
+	opacity: 0.6; 
+	cursor: not-allowed; 
+}

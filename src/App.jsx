@@ -11,7 +11,7 @@ import Diet from '../Pages/Diet.jsx';
 import History from '../Pages/History.jsx';
 import Social from '../Pages/Social.jsx';
 import Setup from '../Pages/Setup.jsx';
-// import Account from '../Pages/Account.jsx';
+import Account from '../Pages/Account.jsx';
 
 function App() {
 
@@ -28,7 +28,7 @@ function App() {
           <Route path = "/history" element={<History />} />
           <Route path = "/social" element={<Social />} />
           <Route path = "/setup" element={<Setup />} />
-          {/* <Route path = "/account" element = {<Account/>} /> */}
+          <Route path = "/account" element = {<Account/>} />
         </Routes>
       </BrowserRouter>
     </div>

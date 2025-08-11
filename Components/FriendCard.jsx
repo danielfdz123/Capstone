@@ -120,7 +120,7 @@ const FriendCard = ({ viewer, user, onChange }) => {
       		<div className = "accountInfo">
         		<div className={`accountPFP ${user?.pfp ? "" : "placeholder"}`}>
           			{user?.pfp ? (
-            		<img src = {user.pfp} alt={`${showName} avatar`}/>
+            		<img className = "pfp" src = {user.pfp} alt={`${showName} avatar`}/>
           				) : (
             		(showName || "U").slice(0, 1).toUpperCase()
           			)}

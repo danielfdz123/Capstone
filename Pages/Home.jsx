@@ -9,7 +9,7 @@ const Home = () => {
     const [selectedDate, setSelectedDate] = useState('');    
     const navigate = useNavigate();
     const [userFirstName, setUserFirstName] = useState('');
-    const [calories, setCalories] = useState('');
+    const [calorieGoal, setCalorieGoal] = useState('');
     const [weight, setCurrentWeight] = useState('');
     const [weightGoal, setWeightGoal] = useState('');
     const [showModal, setShowModal] = useState(false);
@@ -51,7 +51,7 @@ const Home = () => {
             if (data) 
             {
                 setUserFirstName(data.first_name || 'User');
-                setCalories(data.calorieGoal || 250);
+                setCalorieGoal(data.calorieGoal || 0 );
                 setCurrentWeight(data.currentWeight);
                 setWeightGoal(data.weightGoal);
             }
@@ -109,8 +109,8 @@ const Home = () => {
                     {/* CALORIES INFO */}
                     <div className = "card">
                         <h3> Calories Remaining: </h3>
-                        <h2> {calories} </h2>
-                        <p> Goal: 2000 | Consumed: 0 | Burned: 0 </p>
+                        <h2> 2100 </h2>
+                        <p> Goal: {calorieGoal} | Consumed: 0 </p>
                         <div className = "progressBar">
                             {/* Need to figure out how to make this work, would be cool tbh */}
                         </div>

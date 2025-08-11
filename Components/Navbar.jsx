@@ -12,9 +12,8 @@ const Navbar = () => {
     };
 
     const handleLogout = () => {
-        // Insert actual logout logic here
-        console.log('User logged out');
-        navigate('/login'); // Redirect to login page
+        localStorage.removeItem('user');
+        navigate('/');
     };
 
     // Close dropdown if clicked outside
@@ -40,17 +39,14 @@ const Navbar = () => {
             </div>
 
             <div className="nav-right" ref={dropdownRef}>
-                <div
-                    className="profile-circle"
-                    title="Profile Setting"
-                    onClick={toggleDropdown}
-                ></div>
-
+                <div className = "profile-circle" title = "Profile Setting" onClick = {toggleDropdown}>
+                    <img className = "navBarPFP" src={JSON.parse(localStorage.getItem("user"))?.pfp || "/defaultPFP.png" }/>
+                </div>
                 {showDropdown && (
-                    <div className="profile-dropdown">
-                        <Link to="/account-settings">Account Settings</Link>
-                        <button onClick={handleLogout}>Logout</button>
-                    </div>
+                <div className="profile-dropdown">
+                    <Link to = "/account"> Account Settings </Link>
+                    <button className = "logout" onClick={handleLogout}>Logout</button>
+                </div>
                 )}
             </div>
         </nav>

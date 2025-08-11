@@ -69,8 +69,9 @@ const Fitness = () => {
                     <div className = "welcomeMsg">
                         <h1> 💪 Welcome to the Fitness Page! 💪 </h1>
                         <p> Here is where you can log your daily workouts! </p>
-                        <p> Simply follow the form below and start logging! </p>
-                        <p> But be sure to save your logs as you go! </p>
+                        <p> Simply follow the form below and start logging. </p>
+                        <p> But be sure to save your logs as you go by hitting the <b><u> Next Exercise</u></b> button! </p>
+                        <p> For better progress tracking, log your body weight and calories burned (estimate) after every workout! </p>
                         <button onClick={() => setShowModal(false)}> Got it! </button>
                     </div>
                 </div>

@@ -59,6 +59,12 @@
     margin-top: 10px;
 }
 
+.progressFill {
+    height: 100%;
+    background: #17af5b;
+    border-radius: 5px;
+}
+
 .quickLinks {
     display: flex;
     justify-content: space-between;

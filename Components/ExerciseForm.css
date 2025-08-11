@@ -27,6 +27,13 @@
     color: white;
 }
 
+.important {
+    justify-content: center;
+    align-items: center;
+    gap: 200px;
+    margin-left: 20px;
+}
+
 /* Form grid */
 .exercise-form {
     display: flex;
@@ -52,7 +59,7 @@
 }
 
 /* Add button */
-.nextExercise, .nextSet {
+.nextExercise, .nextSet, .saveStats {
     padding: 8px 10px;
     font-size: 13px;
     background-color: #3babf6;

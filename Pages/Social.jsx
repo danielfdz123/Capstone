@@ -19,7 +19,7 @@ const Social = () => {
 		const username_ = parsedUser.username || '';
     	setUsername(username_);
 
-    	const modalFlagKey = `fitnessModalShown_${username_}`;
+    	const modalFlagKey = `socialModalShown_${username_}`;
     	const modalShown = localStorage.getItem(modalFlagKey);
     	if (!modalShown && username_) 
     	{
@@ -69,9 +69,11 @@ const Social = () => {
       	{showModal && (
         	<div className = "welcomeDiv">
           		<div className = "welcomeMsg">
-            		<h1> 📁 Welcome to the Social Page! 📁 </h1>
-            		<p> Here you can add people, and view your friends along with other accounts </p>
-            		<button onClick={() => setShowModal(false)}> Sounds Good! </button>
+            		<h1> 👥 Welcome to the Social Page! 👥 </h1>
+					<p> Connect with your friends! </p>
+            		<p> Here you can follow/unfollow people and stay connected! </p>
+					<p> You can either filter through all accounts, your following, and your followers! </p>
+            		<button onClick={() => setShowModal(false)}> Awesome! </button>
           		</div>
         	</div>
       	)}

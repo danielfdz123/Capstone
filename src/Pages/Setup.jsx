@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../client';
 import { useNavigate } from 'react-router-dom';
-import './SetUp.css';
+import './Setup.css';
 
 const SetUp = () => {
   const [user, setUser] = useState(null);

@@ -3,8 +3,8 @@ import { Link } from 'react-router-dom';
 import { supabase } from '../client';
 
 import './Fitness.css';
-import Navbar from '../Components/Navbar';
-import ExerciseForm from '../Components/ExerciseForm';
+import Navbar from '../../Components/Navbar';
+import ExerciseForm from '../../Components/ExerciseForm';
 
 const Fitness = () => {
     const [selectedDate, setSelectedDate] = useState('');

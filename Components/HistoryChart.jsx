@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './HistoryChart.css';
-import { supabase } from '../client';
+import { supabase } from '../src/client';
 
 const HistoryChart = ({ username, selectedDate, onSelectedDateChange, onDayCount }) => {
     const [exerciseList, setExerciseList] = useState([]);

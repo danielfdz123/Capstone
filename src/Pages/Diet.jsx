@@ -3,8 +3,8 @@ import { Link } from 'react-router-dom';
 import { supabase } from '../client';
 
 import './Diet.css';
-import Navbar from '../Components/Navbar';
-import FoodLog from '../Components/FoodLog';
+import Navbar from '../../Components/Navbar';
+import FoodLog from '../../Components/FoodLog';
 
 const Diet = () => {
   	const [selectedDate, setSelectedDate] = useState('');

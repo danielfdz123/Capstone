@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import Navbar from '../Components/Navbar';
-import HistoryChart from '../Components/HistoryChart';
+import Navbar from '../../Components/Navbar';
+import HistoryChart from '../../Components/HistoryChart';
 import { supabase } from '../client';
 import './History.css';
 

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import Navbar from "../Components/Navbar";
+import Navbar from "../../Components/Navbar";
 import { supabase } from "../client";
 import './Account.css';
 

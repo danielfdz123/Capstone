@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import FriendCard from "../Components/FriendCard";
+import FriendCard from "../../Components/FriendCard";
 import "./Social.css";
-import Navbar from '../Components/Navbar';
+import Navbar from '../../Components/Navbar';
 import {supabase} from '../client';
 
 const Social = () => {

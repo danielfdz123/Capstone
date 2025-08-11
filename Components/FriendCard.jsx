@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { supabase } from "../client";
+import { supabase } from "../src/client";
 import "./FriendCard.css";
 
 const FriendCard = ({ viewer, user, onChange }) => {

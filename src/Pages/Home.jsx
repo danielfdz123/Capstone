@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '../client';
 
 import './Home.css';
-import Navbar from '../Components/Navbar';
+import Navbar from '../../Components/Navbar';
 
 const Home = () => {
     const [selectedDate, setSelectedDate] = useState('');    

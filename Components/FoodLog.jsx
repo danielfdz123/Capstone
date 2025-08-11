@@ -1,6 +1,6 @@
 // src/Components/FoodLog.jsx
 import React, { useState, useEffect, useCallback } from 'react';
-import { supabase } from '../client';
+import { supabase } from '../src/client';
 import './FoodLog.css';
 
 const FoodLog = ({ username, onFoodLogged }) => {

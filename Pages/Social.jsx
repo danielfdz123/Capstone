@@ -1,71 +1,147 @@
-// Pages/Social.jsx
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import FriendCard from "../Components/FriendCard";
 import "./Social.css";
 import Navbar from '../Components/Navbar';
+import {supabase} from '../client';
 
 const Social = () => {
-  // initial hard‑coded suggestions
-  const suggestedList = ["Taki", "Afif", "Daniel", "Kevin", "Jason", "Alpha"];
+  	// const [selectedDate, setSelectedDate] = useState('');
+  	const [username, setUsername] = useState('');
+  	const [showModal, setShowModal] = useState(false);
+  	const [query, setQuery] = useState("");
   
-  // state for your friends and remaining suggestions
-  const [friends, setFriends] = useState([]);
-  const [suggested, setSuggested] = useState(suggestedList);
+  	const [viewMode, setViewMode] = useState("all"); 
+  	const [accounts, setAccounts] = useState([]);
 
-  // state for search query
-  const [query, setQuery] = useState("");
+ 	useEffect(() => {
+    	const storedUser = localStorage.getItem('user');
+		const parsedUser = storedUser ? JSON.parse(storedUser) : {};
+		const username_ = parsedUser.username || '';
+    	setUsername(username_);
 
-  // handle adding a friend
-  const handleAdd = (name) => {
-    setFriends((old) => [...old, name]);
-    setSuggested((old) => old.filter((n) => n !== name));
-  };
+    	const modalFlagKey = `fitnessModalShown_${username_}`;
+    	const modalShown = localStorage.getItem(modalFlagKey);
+    	if (!modalShown && username_) 
+    	{
+      	setShowModal(true);
+      	localStorage.setItem(modalFlagKey, 'true');
+    	}
 
-  // filter suggestions by search query
-  const filtered = suggested.filter((name) =>
-    name.toLowerCase().includes(query.toLowerCase())
-  );
+    	if (!username) {
+    	  return;
+    	}
+    	fetchAccounts();
+  	}, [viewMode, username]);
 
-  return (
-    
-    <div className="social-page">
-        {/* IMPORT NAVBAR COMPONENT */}
+
+  	const fetchAccounts = async () => {
+    	let { data, error } = await supabase
+      	.from("Accounts")
+      	.select("pfp, username, first_name, last_name, following, followers");
+
+    	// Change the viewing based on if "all accounts", "following", and "followers" are selected
+    	if (viewMode === "following") 
+    	{
+      		const myAccount = data.find(a => a.username === username);
+      		const myFollowing = myAccount?.following || [];
+      		data = data.filter(a => myFollowing.includes(a.username));
+    	} 
+    	else if (viewMode === "followers") 
+    	{
+      		const myAccount = data.find(a => a.username === username);
+      		const myFollowers = myAccount?.followers || [];
+      		data = data.filter(a => myFollowers.includes(a.username));
+    	}
+    	setAccounts(data.filter(a => a.username !== username));
+  		};
+
+  		// filter by search query
+  		const filteredAccounts = accounts.filter(acc => {
+    		const fullName = `${acc.first_name || ""} ${acc.last_name || ""}`.toLowerCase();
+    		return (
+      			acc.username.toLowerCase().includes(query.toLowerCase()) ||
+      			fullName.includes(query.toLowerCase())
+    		);
+  		});
+
+  		return (
+    	<>
+      	{showModal && (
+        	<div className = "welcomeDiv">
+          		<div className = "welcomeMsg">
+            		<h1> 📁 Welcome to the Social Page! 📁 </h1>
+            		<p> Here you can add people, and view your friends along with other accounts </p>
+            		<button onClick={() => setShowModal(false)}> Sounds Good! </button>
+          		</div>
+        	</div>
+      	)}
+
+      	<div className="social-page">
+          	{/* IMPORT NAVBAR COMPONENT */}
             <div className = "navDiv">
                 <Navbar />
             </div>
 
+        	<div className = " socialContent">
+        	  	{/* SEARC BAR + VIEW SOCIAL PAGE STUFF */}
+        	  	<div className = "searchViewDiv">
+        	    	<input
+        	      		className = "searchBar"
+        	      		type = "text"
+        	      		placeholder = "Search users..."
+        	      		onChange={(e) => setQuery(e.target.value)}
+        	    	/>
+        	    	<div className = "viewDiv">
 
-      <h2>Your Friends</h2>
-      <div className="friend-list">
-        {friends.length
-          ? friends.map((n) => <FriendCard key={n} name={n} />)
-          : <p>No friends yet</p>
-        }
-      </div>
+						{/* VIEW ALL */}
+        	      		<button
+        	        		className = {`viewButtons ${viewMode === "all" ? "active" : ""}`}
+        	        		onClick={() => setViewMode("all")}
+        	      		>
+        	        	All Accounts
+        	      		</button>
 
-      <h2>Find Friends</h2>
-      {/* Search bar */}
-      <input
-        className="friend-search"
-        type="text"
-        placeholder="Search users..."
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-      />
+						{/* VIEW FOLLOWING */}
+        	      		<button
+        	        		className = {`viewButtons ${viewMode === "following" ? "active" : ""}`}
+        	        		onClick={() => setViewMode("following")}
+        	      		>
+        	        	Following
+        	      		</button>
 
-      <div className="friend-list">
-        {filtered.length
-          ? filtered.map((n) => (
-              <FriendCard
-                key={n}
-                name={n}
-                onAdd={() => handleAdd(n)}
-              />
-            ))
-          : <p>No matching users</p>
-        }
-      </div>
-    </div>
+						{/* VIEW FOLLOWERS*/}
+        	      		<button
+        	        		className = {`viewButtons ${viewMode === "followers" ? "active" : ""}`}
+        	        		onClick={() => setViewMode("followers")}
+        	      		>
+        	        	Followers
+        	      		</button>
+        	    	</div>
+        	  	</div>
+
+        	  	{/* VIEWING ALL/FOLLOWING/FOLLOWERS STUFF */}
+        	  	<div className = "viewAccounts">
+        	    	{filteredAccounts.length > 0 ? (
+        	      		filteredAccounts.map((acc, i) => (
+        	        	<FriendCard
+        	        	  	key = {i}
+        	        	  	viewer = {username}
+        	        	  	user = {{
+        	        	    	username: acc.username,
+								firstName: acc.first_name,
+								lastName: acc.last_name,
+        	            		pfp: acc.pfp
+        	          		}}
+        	          		onChange={fetchAccounts}
+        	        	/>
+        	      		))
+        	    	) : (
+        	      	<h3 className = "noUsersFound"> No users found. </h3>
+        	    	)}
+        	  	</div>
+        	</div>
+      	</div>
+    </>
   );
 };
 

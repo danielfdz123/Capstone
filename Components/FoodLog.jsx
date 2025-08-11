@@ -12,8 +12,9 @@ const FoodLog = () => {
   });
 
   const [totalCalories, setTotalCalories] = useState(0);
-  const [username, setUsername] = useState(null);
 
+  const [username, setUsername] = useState(null);
+  
   const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
 
   const fullFoodList = [
